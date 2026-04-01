@@ -8,7 +8,8 @@
 		"web:dev": "pnpm run --filter=web dev",
 		"dev": "pnpm -r --parallel run dev",
 		"lint": "pnpx @biomejs/biome check",
-		"lint:fix": "pnpx @biomejs/biome check --write --unsafe"
+		"lint:fix": "pnpx @biomejs/biome check --write --unsafe",
+		"prepare": "husky"
 	},
 	"keywords": [],
 	"author": "",
@@ -18,6 +19,7 @@
 		"@tanstack/create-start": "^0.59.18"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "2.4.10"
+		"@biomejs/biome": "2.4.10",
+		"husky": "^9.1.7"
 	}
 }
