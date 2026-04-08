@@ -16,16 +16,18 @@ MoonForge's Refine phase enables surgical modifications to existing projects wit
 
 **Affected Code:**
 
-- Integration between existing modules:
-  - `chat-module`: Store user request and AI response
-  - `generation-flow`: Trigger refine generation
-  - `projects-module`: Update project status
+- `apps/api/src/modules/refinement/refinement.service.ts` — New; orchestration logic
+- `apps/api/src/modules/refinement/refinement.routes.ts` — New; API endpoint
 
 **Dependencies:**
 
-- `generation-flow` for `generateRefine()` function
-- `chat-module` for message storage
-- `projects-module` for status updates
+| Module | Function | Purpose |
+|--------|----------|---------|
+| `generation-flow` | `generateRefine()` | Creates new version, copies files, returns `filesChanged[]` |
+| `chat-module` | `createMessage()` | Store user request and AI response with file changes |
+| `projects-module` | `updateProject()` | Update project status to "refined" |
+
+**Note:** The `generateRefine()` function returns `filesChanged: string[]` which is critical for tracking which files were modified per refinement session.
 
 **Out of Scope (separate specs):**
 

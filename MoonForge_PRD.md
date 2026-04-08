@@ -39,7 +39,7 @@ MoonForge menggunakan pendekatan **Template Base + AI Customization**:
 | Komponen | Deskripsi |
 |---|---|
 | **Template Base** | Seluruh infrastruktur yang tidak berubah antar project — Moon config, koneksi antar app, Biome, Docker, pnpm workspace, tsconfig. Sudah teruji dan siap jalan. |
-| **AI Customization** | Hanya bagian yang spesifik per project — Prisma schema, module routes/service/Zod, shared types, dan OpenSpec docs. |
+| **AI Customization** | Hanya bagian yang spesifik per project — Prisma schema, module routes/service/Zod, shared types. |
 
 ### 2.3 Dua Fase Utama
 
@@ -228,7 +228,6 @@ Stack ini bersifat opinionated dan tidak dapat diganti. Yang dikustomisasi hanya
 | `prisma/schema.prisma` | Model dan relasi sesuai kebutuhan user |
 | `src/modules/{m}/*.ts` | Routes, Zod schema, service per module |
 | `packages/types/src/index.ts` | Shared TypeScript types dari Prisma schema |
-| `openspec/specs/{p}/*.md` | Proposal, tasks, dan design documentation (internal only) |
 
 ---
 
@@ -249,7 +248,6 @@ Setelah monorepo ter-generate, user masuk ke workspace tiga panel:
 ### 7.1 Fase 1 — Setup
 
 - Input natural language
-- OpenSpec preview + konfirmasi user
 - Merge template + AI customization
 - Simpan ke PostgreSQL
 - File tree preview dengan label: template vs AI-generated
