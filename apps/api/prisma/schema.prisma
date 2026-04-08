@@ -1,13 +1,120 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// ========== Users ==========
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+
+  @@map("users")
+  @@index([email])
+}
+
+// ========== Projects ==========
+model Project {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  name        String
+  description String
+  status      ProjectStatus @default(DRAFT)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  versions      ProjectVersion[]
+  files         ProjectFile[]
+  chatMessages  ChatMessage[]
+
+  @@map("projects")
+  @@index([userId])
+  @@index([status])
+}
+
+enum ProjectStatus {
+  DRAFT
+  GENERATED
+  REFINED
+}
+
+// ========== Project Versions ==========
+model ProjectVersion {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  versionNumber Int
+  label         String?
+  createdAt     DateTime @default(now())
+
+  files        ProjectFile[]
+  chatMessages ChatMessage[]
+
+  @@unique([projectId, versionNumber])
+  @@map("project_versions")
+  @@index([projectId])
+}
+
+// ========== Project Files ==========
+model ProjectFile {
+  id         String       @id @default(cuid())
+  projectId  String
+  project    Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  versionId  String
+  version    ProjectVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  path       String       // relative path e.g., "apps/api/src/index.ts"
+  content    String       @db.Text
+  fileSource FileSource   @default(AI_GENERATED)
+
+  updatedAt  DateTime     @updatedAt
+
+  @@unique([versionId, path])
+  @@map("project_files")
+  @@index([versionId])
+  @@index([projectId])
+}
+
+enum FileSource {
+  TEMPLATE
+  AI_GENERATED
+  MODIFIED
+}
+
+// ========== Chat Messages ==========
+model ChatMessage {
+  id          String       @id @default(cuid())
+  projectId   String
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  versionId   String
+  version     ProjectVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  role        MessageRole
+  content     String       @db.Text
+  fileChanges Json?        // { "modifiedPaths": ["path1", "path2"] }
+
+  createdAt   DateTime     @default(now())
+
+  @@map("chat_messages")
+  @@index([projectId])
+  @@index([versionId])
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
 }
