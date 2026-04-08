@@ -4,18 +4,26 @@
 	"scripts": {
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
-		"start": "node dist/index.js"
+		"start": "node dist/index.js",
+		"prisma:generate": "prisma generate"
 	},
 	"dependencies": {
+		"@anthropic-ai/sdk": "^0.33.1",
 		"@hono/node-server": "^1.19.12",
+		"@hono/zod-validator": "^0.4.3",
 		"@prisma/adapter-pg": "^7.6.0",
 		"@prisma/client": "^7.6.0",
 		"dotenv": "^17.4.0",
 		"hono": "^4.12.9",
-		"prisma": "^7.6.0"
+		"jszip": "^3.10.1",
+		"pg": "^8.14.1",
+		"prisma": "^7.6.0",
+		"zod": "^3.24.2"
 	},
 	"devDependencies": {
+		"@types/jszip": "^3.4.1",
 		"@types/node": "^20.11.17",
+		"@types/pg": "^8.12.1",
 		"tsx": "^4.7.1",
 		"typescript": "^5.8.3"
 	}

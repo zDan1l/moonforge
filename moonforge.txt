@@ -1,0 +1,338 @@
+
+🌕
+
+MoonForge
+
+Product Requirements Document
+
+Setup fullstack monorepo dalam hitungan menit.
+Sesuaikan kebutuhan project-mu selamanya lewat chat.
+
+Versi
+1.0 — MVP
+Target
+Hackathon Refactory
+Timeline
+24 Jam Build Sprint
+
+
+CONFIDENTIAL
+
+
+1. Executive Summary
+MoonForge adalah AI workspace untuk setup dan refinement fullstack monorepo. Produk ini memangkas proses setup dari berjam-jam menjadi hitungan menit dengan menggabungkan template monorepo yang sudah teruji dengan kustomisasi berbasis Claude AI.
+
+Problem Statement
+Setup fullstack monorepo dengan Moon memakan waktu lama. Developer harus mengkonfigurasi secara manual struktur folder, Moon tasks, koneksi antar app, Prisma schema, Zod validation, routing, dan shared types — semua harus konsisten sejak awal. Ketika project berkembang, menambah satu tabel berarti update schema, types, routes, dan service sekaligus. Satu file tidak sinkron = aplikasi error.
+
+
+MoonForge hadir untuk membebaskan developer dari boilerplate dan konfigurasi, sehingga mereka bisa fokus membangun produk.
+
+
+2. Product Overview
+2.1 One-Liner
+"Setup fullstack Moon monorepo dalam hitungan menit. Sesuaikan kebutuhan project-mu selamanya lewat chat."
+2.2 Pendekatan Utama
+MoonForge menggunakan pendekatan Template Base + AI Customization:
+
+Komponen
+Deskripsi
+Template Base
+Seluruh infrastruktur yang tidak berubah antar project — Moon config, koneksi antar app, Biome, Docker, pnpm workspace, tsconfig. Sudah teruji dan siap jalan.
+AI Customization
+Hanya bagian yang spesifik per project — Prisma schema, module routes/service/Zod, shared types, dan OpenSpec docs.
+
+2.3 Dua Fase Utama
+Fase 1 — Setup
+User mendeskripsikan kebutuhan project dalam bahasa natural.
+AI menampilkan OpenSpec preview: daftar module, Prisma models, routing, dan estimasi jumlah file.
+User konfirmasi → MoonForge merge template + customization Claude.
+File disimpan ke PostgreSQL → tampilkan file tree → download .zip.
+pnpm install → pnpm run dev → langsung jalan.
+
+Fase 2 — Refine
+User bisa kembali ke project kapanpun dari history.
+Chatbot context-aware mengetahui seluruh struktur project.
+Claude memodifikasi hanya file yang relevan (surgical, bukan regenerate ulang).
+Sebelum download, user melihat diff view — perubahan file mana saja.
+Download .zip versi terbaru → sinkronisasi database dengan pnpm prisma migrate dev.
+
+
+3. User Flow
+3.1 Fase 1 — Setup
+
+Contoh Input User:
+"SaaS B2B dengan module users, subscription, dan dashboard analytics"
+
+AI Menampilkan OpenSpec Preview:
+Module: users, subscription, analytics
+Prisma models: User, Subscription, Event
+Routes yang akan dibuat (CRUD per module)
+"30 file total: 22 dari template, 8 di-generate AI"
+
+Setelah user konfirmasi → Template base + customization Claude digabung → File tree preview → Download .zip
+
+
+3.2 Fase 2 — Refine
+
+Contoh Sesi Refine:
+User: "tambah tabel products dengan field name, price, stock, category_id"
+
+AI:   "Akan mengubah 4 file:
+        ~ apps/api/prisma/schema.prisma
+        + apps/api/src/modules/products/
+        ~ packages/types/src/index.ts"
+
+User: "oke, tapi tambah field image_url juga"
+AI:   [modifikasi hanya file yang relevan] → Diff view → Download .zip
+
+
+
+
+
+4. Tech Stack Output
+Stack ini bersifat opinionated dan tidak dapat diganti. Yang dikustomisasi hanyalah schema, module, dan routing sesuai deskripsi project.
+
+Layer
+Tool / Library
+Monorepo
+Moon + PNPM
+Frontend
+React 19 + TanStack Router + TanStack Start
+Backend
+Hono.js
+ORM
+Prisma + PostgreSQL
+Validation
+Zod
+Styling
+Tailwind CSS v4
+Linter
+Biome
+Git Hooks
+Husky
+
+
+
+5. Struktur Output Monorepo
+5.1 File Tree
+
+📁 {project-name}/
+├── .moon/
+│   ├── workspace.yml         [template]
+│   └── tasks.yml             [template]
+├── apps/
+│   ├── platform/             [TanStack Start + React 19]
+│   │   └── src/routes/       [AI generate]
+│   ├── admin/                [TanStack Start + React 19]
+│   └── api/                  [Hono + Prisma + Zod]
+│       ├── src/modules/{m}/
+│       │   ├── {m}.routes.ts   [AI generate]
+│       │   ├── {m}.schema.ts   [AI generate]
+│       │   └── {m}.service.ts  [AI generate]
+│       └── prisma/schema.prisma [AI generate]
+├── packages/types/src/index.ts [AI generate]
+├── openspec/specs/{project}/
+│   ├── proposal.md           [AI generate]
+│   ├── tasks.md              [AI generate]
+│   └── design.md             [AI generate]
+├── biome.json                [template]
+├── docker-compose.yml        [template]
+└── pnpm-workspace.yaml       [template]
+
+5.2 File yang Di-generate AI
+File
+Isi
+prisma/schema.prisma
+Model dan relasi sesuai kebutuhan user
+src/modules/{m}/*.ts
+Routes, Zod schema, service per module
+packages/types/src/index.ts
+Shared TypeScript types dari Prisma schema
+openspec/specs/{p}/*.md
+Proposal, tasks, dan design documentation
+
+
+
+6. UI — Tiga Panel Workspace
+Setelah monorepo ter-generate, user masuk ke workspace tiga panel:
+
+Panel
+Fungsi
+Panel Kiri
+Chatbot refine — input permintaan perubahan dalam bahasa natural, riwayat percakapan per project.
+Panel Tengah
+Code preview — tampilkan isi file dengan diff highlighting, menandai baris yang berubah.
+Panel Kanan
+File explorer — tree struktur monorepo, file yang berubah ditandai dengan warna berbeda (template vs AI-generated vs modified).
+
+
+
+7. MVP Scope — 24 Jam
+7.1 Fase 1 — Setup
+Input natural language
+OpenSpec preview + konfirmasi user
+Merge template + AI customization
+Simpan ke PostgreSQL
+File tree preview dengan label: template vs AI-generated
+Download .zip → pnpm install → pnpm run dev
+7.2 Fase 2 — Refine
+History project dari database
+Chatbot context-aware (tahu seluruh struktur project)
+Modifikasi file spesifik (surgical)
+Auto-update shared types setiap ada perubahan schema
+Diff view sebelum download
+Download .zip versi terbaru
+7.3 Kemampuan Refine — MVP vs Post-MVP
+
+Status
+Kemampuan
+✅ MVP
+Tambah Prisma model baru, tambah field ke model yang ada, tambah module baru (routes + schema + service), tambah route baru di module yang ada, auto-update shared types.
+❌ Post-MVP
+Rename tabel dengan cascade changes, refactor struktur folder, auto-generate migration SQL.
+
+
+📝 Catatan Database Migration
+Untuk migrasi database di MVP: setelah download dan install, user cukup jalankan pnpm prisma migrate dev untuk menginisialisasi database dari schema yang sudah ada.
+
+7.4 Infrastruktur
+Deploy di Kubernetes
+PostgreSQL untuk semua persistence (project files, chat history, user sessions)
+
+
+8. Database Schema MoonForge
+
+TABLE: users
+id
+UUID primary key
+email
+VARCHAR, unique
+created_at
+TIMESTAMP
+
+
+TABLE: projects
+id
+UUID primary key
+user_id
+UUID → users.id
+name
+VARCHAR
+description
+TEXT
+status
+ENUM: draft | generated | modified
+created_at
+TIMESTAMP
+updated_at
+TIMESTAMP
+
+
+TABLE: project_files
+id
+UUID primary key
+project_id
+UUID → projects.id
+path
+VARCHAR — e.g. apps/api/prisma/schema.prisma
+content
+TEXT — isi file
+is_template
+BOOLEAN — true jika berasal dari template
+updated_at
+TIMESTAMP
+
+
+TABLE: chat_messages
+id
+UUID primary key
+project_id
+UUID → projects.id
+role
+ENUM: user | assistant
+content
+TEXT
+file_changes
+JSONB — daftar file yang berubah
+created_at
+TIMESTAMP
+
+
+File disimpan per-path di database, bukan sebagai blob .zip. Ketika Claude memodifikasi satu file, hanya row itu yang di-update. File dari template tidak disentuh kecuali ada perubahan versi template.
+
+
+9. Arsitektur MoonForge
+MoonForge sendiri dibangun sebagai Moon monorepo — dogfooding konsepnya sendiri.
+
+📁 moonforge/
+├── apps/
+│   ├── web/          ← TanStack Start (UI utama)
+│   └── api/          ← Hono.js (REST API)
+├── packages/
+│   ├── generator/    ← logic: template merge + AI customization
+│   ├── types/        ← shared TypeScript types
+│   ├── ui/           ← shared components
+│   └── db/           ← Prisma + PostgreSQL
+└── infra/
+    ├── k8s/          ← Kubernetes manifests
+    └── Dockerfile.*
+
+
+
+10. Competitive Differentiation
+
+Fitur
+Template CLI
+AI Generator
+MoonForge
+Input
+Pilih template
+Natural language
+Natural language
+Output
+Statis
+Generate sekali
+Template + AI customization
+Konsistensi
+Manual
+Tidak terjamin
+Selalu terjamin
+Iterasi
+Dari nol
+Dari nol
+Surgical per file
+Moon support
+✗
+✗
+✓
+Persistent workspace
+✗
+✗
+✓
+
+
+
+11. Kesesuaian Hackathon Refactory
+
+Requirement
+Pemenuhan MoonForge
+Engineering Productivity x AI
+Setup berjam-jam → hitungan menit; refine selamanya lewat chat
+OpenSpec
+Preview step sebelum generate — proposal, tasks, design docs
+LLMs
+Claude API untuk customization & chatbot refine yang context-aware
+PostgreSQL
+Persistensi project files, chat history, user sessions
+Kubernetes
+Deploy MoonForge ke K8s — production-ready infra
+
+
+
+12. Pitch Final
+
+"MoonForge memangkas waktu setup fullstack monorepo dari berjam-jam menjadi hitungan menit. Template yang sudah teruji menjadi fondasinya — TanStack Start di frontend, Hono di backend. User cukup deskripsikan kebutuhan project, Claude menyesuaikan schema, module, dan routing. Hasilnya langsung bisa dijalankan. Dan ketika project berkembang, chatbot yang sudah tahu seluruh struktur project siap membantu refinement kapanpun — tanpa generate ulang, tanpa kehilangan konsistensi."
+
+
+

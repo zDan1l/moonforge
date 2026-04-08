@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm run:*)",
+      "Bash(pnpm biome:*)",
+      "Bash(docker-compose:*)",
+      "Bash(pnpm prisma:*)",
+      "Bash(pnpm dev:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :8000)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx tsr:*)",
+      "Bash(pnpm --filter=web exec tsr generate)",
+      "Bash(pnpm api:dev)"
+    ]
+  }
+}
