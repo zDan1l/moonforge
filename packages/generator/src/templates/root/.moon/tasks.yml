@@ -1,0 +1,77 @@
+tasks:
+  dev:
+    command: "pnpm -r --parallel run dev"
+    desc: "Run all apps in development mode"
+    inputs:
+      - "@globs([\"apps/**/package.json\", \"packages/**/package.json\"])"
+    outputs:
+      - ".moon/cache/**"
+
+  build:
+    command: "pnpm -r --filter=!web run build"
+    desc: "Build all packages and API"
+    inputs:
+      - "@globs([\"apps/**/src/**/*.ts\", \"packages/**/src/**/*.ts\"])"
+    outputs:
+      - "apps/api/dist/**"
+      - "packages/**/dist/**"
+
+  api:dev:
+    command: "pnpm --filter=api dev"
+    desc: "Run API in development mode"
+    inputs:
+      - "apps/api/src/**"
+    outputs:
+      - ".moon/cache/tasks/api:dev"
+
+  web:dev:
+    command: "pnpm --filter=web dev"
+    desc: "Run web app in development mode"
+    inputs:
+      - "apps/web/src/**"
+    outputs:
+      - ".moon/cache/tasks/web:dev"
+
+  db:generate:
+    command: "pnpm --filter=api prisma generate"
+    desc: "Generate Prisma client"
+    inputs:
+      - "apps/api/prisma/schema.prisma"
+
+  db:migrate:
+    command: "pnpm --filter=api prisma migrate dev"
+    desc: "Run database migrations"
+    inputs:
+      - "apps/api/prisma/schema.prisma"
+    outputs:
+      - "apps/api/prisma/migrations/**"
+
+  db:push:
+    command: "pnpm --filter=api prisma db push"
+    desc: "Push schema to database (development)"
+    inputs:
+      - "apps/api/prisma/schema.prisma"
+
+  lint:
+    command: "pnpm -r run lint"
+    desc: "Run linter on all packages"
+    inputs:
+      - "@globs([\"**/*.ts\", \"**/*.tsx\", \"biome.json\"])"
+    outputs:
+      - ".moon/cache/lint/**"
+
+  lint:fix:
+    command: "pnpm -r run lint:fix"
+    desc: "Fix linting issues automatically"
+    inputs:
+      - "@globs([\"**/*.ts\", \"**/*.tsx\", \"biome.json\"])"
+    outputs:
+      - ".moon/cache/lint:fix/**"
+
+  typecheck:
+    command: "pnpm -r run typecheck"
+    desc: "Run TypeScript type checking"
+    inputs:
+      - "@globs([\"**/*.ts\", \"**/*.tsx\", \"tsconfig.json\"])"
+    outputs:
+      - ".moon/cache/typecheck/**"

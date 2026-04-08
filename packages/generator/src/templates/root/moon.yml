@@ -1,0 +1,22 @@
+$schema: 'https://moonrepo.dev/schemas/project.json'
+
+workspace:
+  # Automatically include tasks from .moon/tasks.yml
+  inheritedTasks:
+    # Enable caching for all tasks
+    runtime:
+      inputs:
+        - 'pnpm-lock.yaml'
+        - '.moon/.lock'
+    # TypeScript type checking
+    typecheck:
+      inputs:
+        - '@globs(["**/*.ts", "**/*.tsx", "tsconfig.json"])'
+    # Linting
+    lint:
+      inputs:
+        - '@globs(["**/*.ts", "**/*.tsx", "biome.json"])'
+
+projects:
+  - apps/*
+  - packages/*
