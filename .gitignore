@@ -1,0 +1,65 @@
+# ======================
+# Dependencies
+# ======================
+node_modules/
+
+# ======================
+# Build Outputs
+# ======================
+dist/
+dist-ssr/
+.output/
+.nitro/
+.vinxi/
+.tanstack/
+
+# ======================
+# Environment Files
+# ======================
+.env
+.env.*
+*.local
+
+# ======================
+# Logs
+# ======================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+
+# ======================
+# Editor / IDE
+# ======================
+.vscode/*
+!.vscode/launch.json
+!.vscode/*.code-snippets
+
+.idea/
+!.idea/codeStyles/
+!.idea/runConfigurations/
+
+# ======================
+# Package Managers
+# ======================
+.yarn/
+!.yarn/releases
+
+# ======================
+# Cloud / Deployment
+# ======================
+.wrangler/
+
+# ======================
+# Misc
+# ======================
+__unconfig*
+todos.json

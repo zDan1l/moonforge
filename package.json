@@ -1,0 +1,22 @@
+{
+	"name": "app",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"api:dev": "pnpm run --filter=api dev",
+		"web:dev": "pnpm run --filter=web dev",
+		"dev": "pnpm -r --parallel run dev",
+		"lint": "pnpx @biomejs/biome check",
+		"lint:fix": "pnpx @biomejs/biome check --write --unsafe",
+		"prepare": "husky"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"packageManager": "pnpm@10.28.0",
+	"devDependencies": {
+		"@biomejs/biome": "2.4.10",
+		"husky": "^9.1.7"
+	}
+}
