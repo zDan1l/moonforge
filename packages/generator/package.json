@@ -1,0 +1,30 @@
+{
+	"name": "@moonforge/generator",
+	"version": "0.1.0",
+	"description": "MoonForge project generator - template merging and zip creation",
+	"type": "module",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsc --watch",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"adm-zip": "^0.5.16"
+	},
+	"devDependencies": {
+		"@types/adm-zip": "^0.5.7",
+		"@types/node": "^20.11.17",
+		"typescript": "^5.8.3"
+	},
+	"peerDependencies": {
+		"zod": "^3.0.0"
+	}
+}

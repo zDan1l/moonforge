@@ -1,0 +1,16 @@
+workspace:
+  inheritedTasks:
+    generate:
+      inputs:
+        - "apps/**/prisma/schema.prisma"
+        - "packages/**/src/**/*.ts"
+    typecheck:
+      inputs:
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "tsconfig.json"
+    lint:
+      inputs:
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "biome.json"
