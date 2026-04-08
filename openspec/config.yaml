@@ -1,0 +1,83 @@
+schema: spec-driven
+
+# Project context
+# This is shown to AI when creating artifacts.
+context: |
+  # MoonForge - AI-Powered Fullstack Monorepo Generator
+
+  ## Tech Stack
+  - Monorepo: Moon + PNPM workspaces
+  - Backend: Hono.js + Prisma + Zod + PostgreSQL
+  - Frontend: React 19 + TanStack Router/Start + Tailwind CSS v4
+  - AI: Anthropic Claude API
+  - Language: TypeScript 5.x
+
+  ## Architecture Pattern
+  - Template Base [T] + AI Customization [AI]
+  - Template files: Moon config, Docker, pnpm workspace, tsconfig, Biome, Husky
+  - AI-generated files: Prisma schema, modules, routes, services, shared types
+
+  ## Project Structure
+  apps/
+    api/          # Hono.js backend [TEMPLATE + AI]
+    web/          # TanStack Start frontend [TEMPLATE]
+  packages/
+    types/        # Shared TypeScript types [AI]
+
+  ## Database Schema
+  - users (id, email, name, created_at, updated_at)
+  - projects (id, user_id, name, description, status, created_at, updated_at)
+  - project_versions (id, project_id, version_number, label, created_at)
+  - project_files (id, project_id, version_id, path, content, file_source, updated_at)
+  - chat_messages (id, project_id, version_id, role, content, file_changes, created_at)
+
+  ## API Structure (apps/api/src)
+  lib/
+    prisma.ts      # Prisma client singleton
+    anthropic.ts   # Claude API client
+  middleware/
+    auth.ts        # User authentication
+    error-handler.ts
+  modules/
+    {module}/
+      {module}.routes.ts    # Hono routes with zValidator
+      {module}.schema.ts    # Zod validation schemas
+      {module}.service.ts   # Business logic with Prisma
+
+  ## Frontend Structure (apps/web/src)
+  components/
+    ui/            # Shared reusable components
+    workspace/
+      Chatbot.tsx         # Panel 1 - Chat interface
+      CodePreview.tsx     # Panel 2 - Code with diff viewer
+      FileExplorer.tsx    # Panel 3 - File tree
+  routes/
+    dashboard/      # Projects list
+    projects/       # Single project workspace (3-panel layout)
+
+  ## Conventions
+  - Use conventional commits (feat, fix, docs, refactor, etc.)
+  - File naming: {module}.routes.ts, {module}.schema.ts, {module}.service.ts
+  - Zod for all input validation
+  - Prisma for all database operations
+  - Biome for linting & formatting
+  - Type-safe by default - shared types auto-update from Prisma
+
+  ## Key Features
+  1. Setup Phase: User describes project → AI generates → Download .zip
+  2. Refine Phase: User modifies project → AI surgical updates → New version
+
+# Per-artifact rules
+rules:
+  proposal:
+    - Include system architecture diagram
+    - Specify all API endpoints with request/response examples
+    - Include complete database schema with relationships
+    - Document frontend layout structure
+  tasks:
+    - Break tasks into chunks of max 2-4 hours
+    - Include success criteria for each task
+    - Group by phase (Infrastructure, Backend, Frontend, Features)
+  changes:
+    - Always include file paths that changed
+    - Describe why the change was made

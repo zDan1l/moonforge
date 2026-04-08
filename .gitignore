@@ -63,3 +63,4 @@ lerna-debug.log*
 # ======================
 __unconfig*
 todos.json
+*.md
