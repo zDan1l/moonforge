@@ -1,15 +1,15 @@
 import { serve } from "@hono/node-server";
 import { config } from "dotenv";
 import { Hono } from "hono";
-import packageJson from "../package.json";
+import packageJson from "../package.json" with { type: "json" };
+import { prisma } from "./lib/prisma.js";
+import { success } from "./lib/response.js";
 
-// Lib
-import { prisma } from "./lib/prisma";
-import { success } from "./lib/response";
-import { corsMiddleware } from "./middleware/cors";
-// Middleware
-import { errorHandler } from "./middleware/error-handler";
-import { loggerMiddleware } from "./middleware/logger";
+import { corsMiddleware } from "./middleware/cors.js";
+import { errorHandler } from "./middleware/error-handler.js";
+import { loggerMiddleware } from "./middleware/logger.js";
+
+import projectsRoutes from "./modules/projects/projects.routes.js";
 
 config({ path: "../../.env" });
 
@@ -95,9 +95,9 @@ app.get("/health", async (c) => {
 
 // ============================================================================
 // Module Routes
-// Future modules will be registered here
-// Example: app.route("/api/projects", projectsRoutes);
 // ============================================================================
+
+app.route("/api/projects", projectsRoutes);
 
 // ============================================================================
 // Root Endpoint (temporary)
