@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +8,115 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ============================================================================
+// MoonForge Database Models
+// ============================================================================
+
+/// User accounts for authentication and ownership
+model users {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  projects  projects[]
+
+  @@map("users")
+}
+
+/// User projects with metadata and status tracking
+model projects {
+  id          String   @id @default(uuid()) @db.Uuid
+  user_id     String   @db.Uuid
+  name        String
+  description String   @db.Text
+  status      project_status @default(draft)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user        users            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  versions    project_versions[]
+  files       project_files[]
+  messages    chat_messages[]
+
+  @@index([user_id])
+  @@map("projects")
+}
+
+/// Project versions for tracking changes and history
+model project_versions {
+  id             String   @id @default(uuid()) @db.Uuid
+  project_id     String   @db.Uuid
+  version_number Int
+  label          String?
+  created_at     DateTime @default(now())
+
+  project        projects        @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  files          project_files[]
+  messages       chat_messages[]
+
+  @@unique([project_id, version_number])
+  @@index([project_id])
+  @@map("project_versions")
+}
+
+/// Generated project files with source tracking
+model project_files {
+  id          String   @id @default(uuid()) @db.Uuid
+  project_id  String   @db.Uuid
+  version_id  String   @db.Uuid
+  path        String
+  content     String   @db.Text
+  file_source file_source @default(ai_generated)
+  updated_at  DateTime @updatedAt
+
+  project     projects          @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  version     project_versions  @relation(fields: [version_id], references: [id], onDelete: Cascade)
+
+  @@unique([version_id, path])
+  @@index([project_id])
+  @@index([version_id])
+  @@map("project_files")
+}
+
+/// Chat messages for AI assistant interaction
+model chat_messages {
+  id          String   @id @default(uuid()) @db.Uuid
+  project_id  String   @db.Uuid
+  version_id  String   @db.Uuid
+  role        message_role
+  content     String   @db.Text
+  file_changes Json?
+  created_at  DateTime @default(now())
+
+  project     projects          @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  version     project_versions  @relation(fields: [version_id], references: [id], onDelete: Cascade)
+
+  @@index([project_id])
+  @@index([version_id])
+  @@map("chat_messages")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum project_status {
+  draft
+  generated
+  refined
+}
+
+enum file_source {
+  template
+  ai_generated
+  modified
+}
+
+enum message_role {
+  user
+  assistant
 }
