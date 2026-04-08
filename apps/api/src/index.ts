@@ -1,16 +1,15 @@
 import { serve } from "@hono/node-server";
 import { config } from "dotenv";
 import { Hono } from "hono";
-import packageJson from "../package.json" assert { type: "json" };
-
-// Middleware
-import { errorHandler } from "./middleware/error-handler";
-import { corsMiddleware } from "./middleware/cors";
-import { loggerMiddleware } from "./middleware/logger";
+import packageJson from "../package.json";
 
 // Lib
 import { prisma } from "./lib/prisma";
 import { success } from "./lib/response";
+import { corsMiddleware } from "./middleware/cors";
+// Middleware
+import { errorHandler } from "./middleware/error-handler";
+import { loggerMiddleware } from "./middleware/logger";
 
 config({ path: "../../.env" });
 
