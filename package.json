@@ -1,22 +1,32 @@
 {
-	"name": "app",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
-	"scripts": {
-		"api:dev": "pnpm run --filter=api dev",
-		"web:dev": "pnpm run --filter=web dev",
-		"dev": "pnpm -r --parallel run dev",
-		"lint": "pnpx @biomejs/biome check",
-		"lint:fix": "pnpx @biomejs/biome check --write --unsafe",
-		"prepare": "husky"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"packageManager": "pnpm@10.28.0",
-	"devDependencies": {
-		"@biomejs/biome": "2.4.10",
-		"husky": "^9.1.7"
-	}
+  "name": "moonforge",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "moon run :dev",
+    "build": "moon run :build",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "type-check": "moon run :type-check",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "moon": "^1.0.0-beta.7",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "biome check --write --no-errors-on-unmatched",
+      "biome format --write --no-errors-on-unmatched"
+    ],
+    "*.{json,jsonc}": ["biome check --write --no-errors-on-unmatched"]
+  }
 }
