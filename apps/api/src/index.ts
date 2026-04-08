@@ -1,21 +1,158 @@
 import { serve } from "@hono/node-server";
 import { config } from "dotenv";
 import { Hono } from "hono";
+import packageJson from "../package.json" assert { type: "json" };
+
+// Middleware
+import { errorHandler } from "./middleware/error-handler";
+import { corsMiddleware } from "./middleware/cors";
+import { loggerMiddleware } from "./middleware/logger";
+
+// Lib
+import { prisma } from "./lib/prisma";
+import { success } from "./lib/response";
 
 config({ path: "../../.env" });
 
+// ============================================================================
+// Hono App Setup
+// ============================================================================
+
 const app = new Hono();
 
-app.get("/", (c) => {
-	return c.text("Hello Hono!");
+// ============================================================================
+// Middleware Pipeline
+// Order: Logger → CORS → Route Handlers → Error Handler
+// ============================================================================
+
+app.use("*", loggerMiddleware);
+app.use("*", corsMiddleware);
+app.onError(errorHandler);
+
+// ============================================================================
+// Health Check Endpoint
+// ============================================================================
+
+app.get("/health", async (c) => {
+	const startTime = Date.now();
+	const _isHealthy = true;
+
+	// Check database connectivity
+	let dbStatus = "healthy";
+	let dbDuration = 0;
+
+	try {
+		const dbStart = Date.now();
+		await prisma.$queryRaw`SELECT 1`;
+		dbDuration = Date.now() - dbStart;
+
+		if (dbDuration > 50) {
+			dbStatus = "degraded";
+		}
+	} catch (_error) {
+		dbStatus = "unhealthy";
+		return c.json(
+			{
+				success: false,
+				error: {
+					code: "SERVICE_UNHEALTHY",
+					message: "Database connection failed",
+				},
+				meta: {
+					timestamp: new Date().toISOString(),
+				},
+			},
+			503,
+		);
+	}
+
+	const overallStatus = dbStatus === "healthy" ? "healthy" : "degraded";
+	const duration = Date.now() - startTime;
+
+	return c.json(
+		success(
+			{
+				service: {
+					name: "moonforge-api",
+					version: packageJson.version,
+					environment: process.env.NODE_ENV || "development",
+				},
+				status: overallStatus,
+				checks: {
+					database: {
+						status: dbStatus,
+						duration: `${dbDuration}ms`,
+					},
+				},
+				duration: `${duration}ms`,
+			},
+			{
+				timestamp: new Date().toISOString(),
+			},
+		),
+		overallStatus === "degraded" ? 200 : 200,
+	);
 });
+
+// ============================================================================
+// Module Routes
+// Future modules will be registered here
+// Example: app.route("/api/projects", projectsRoutes);
+// ============================================================================
+
+// ============================================================================
+// Root Endpoint (temporary)
+// ============================================================================
+
+app.get("/", (c) => {
+	return c.json(
+		success(
+			{
+				message: "MoonForge API",
+				version: packageJson.version,
+				docs: "/health",
+			},
+			{
+				timestamp: new Date().toISOString(),
+			},
+		),
+	);
+});
+
+// ============================================================================
+// 404 Handler
+// ============================================================================
+
+app.notFound((c) => {
+	return c.json(
+		{
+			success: false,
+			error: {
+				code: "NOT_FOUND",
+				message: `Route ${c.req.method} ${c.req.path} not found`,
+			},
+			meta: {
+				timestamp: new Date().toISOString(),
+			},
+		},
+		404,
+	);
+});
+
+// ============================================================================
+// Start Server
+// ============================================================================
+
+const port = parseInt(process.env.API_PORT || "5000", 10);
 
 serve(
 	{
 		fetch: app.fetch,
-		port: 4000,
+		port,
 	},
 	(info) => {
-		console.log(`Server is running on http://localhost:${info.port}`);
+		console.log(`🚀 MoonForge API running on http://localhost:${info.port}`);
+		console.log(`📊 Health check: http://localhost:${info.port}/health`);
+		console.log(`🔧 Environment: ${process.env.NODE_ENV || "development"}`);
 	},
 );

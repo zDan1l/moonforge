@@ -22,7 +22,16 @@
 			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"\\\\dt\")",
 			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"\\\\dT+ project_status file_source message_role\")",
 			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"\\\\dT+ file_source\")",
-			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"\\\\d users\")"
+			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"\\\\d users\")",
+			"Bash(pnpm add:*)",
+			"Bash(pnpm run:*)",
+			"Bash(curl -s http://localhost:4000/health)",
+			"Bash(netstat -ano)",
+			"Bash(xargs -I {} taskkill //F //PID {})",
+			"Bash(curl -s http://localhost:4001/health)",
+			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"SELECT 1\")",
+			"Bash(curl:*)",
+			"Bash(pnpm exec:*)"
 		]
 	}
 }

@@ -1,23 +1,6 @@
-import { PrismaClient } from "@/generated/prisma";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../generated/prisma/client.js";
 
-/**
- * Prisma Client singleton instance
- *
- * In development, reuse the instance to avoid exhausting database connections
- * In production, create a new instance per request lifecycle
- */
-const prismaClientSingleton = () => {
-	return new PrismaClient();
-};
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 
-declare global {
-	var prismaGlobal: undefined | ReturnType<typeof prismaClientSingleton>;
-}
-
-const prisma = globalThis.prismaGlobal ?? prismaClientSingleton();
-
-if (process.env.NODE_ENV !== "production") {
-	globalThis.prismaGlobal = prisma;
-}
-
-export default prisma;
+export const prisma = new PrismaClient({ adapter });
