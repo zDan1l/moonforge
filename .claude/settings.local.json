@@ -32,7 +32,8 @@
 			"Bash(psql \"postgresql://postgres:postgres@localhost:5445/postgres\" -c \"SELECT 1\")",
 			"Bash(curl:*)",
 			"Bash(pnpm exec:*)",
-			"Bash(pnpm check:*)"
+			"Bash(pnpm check:*)",
+			"Bash(pnpm lint:*)"
 		]
 	}
 }

@@ -1,6 +1,6 @@
 import type { Route } from "./+types/index";
 
-export function meta({}: Route.MetaArgs) {
+export function meta(_route: Route.MetaArgs) {
 	return [
 		{ title: "Admin Dashboard" },
 		{
@@ -10,7 +10,7 @@ export function meta({}: Route.MetaArgs) {
 	];
 }
 
-export default function Index({}: Route.ComponentProps) {
+export default function Index(_route: Route.ComponentProps) {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -31,7 +31,9 @@ export default function Index({}: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
+												aria-label="Projects icon"
 											>
+												<title>Projects</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -78,7 +80,9 @@ export default function Index({}: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
+												aria-label="Sessions icon"
 											>
+												<title>Sessions</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -103,9 +107,7 @@ export default function Index({}: Route.ComponentProps) {
 								</div>
 							</div>
 							<div className="bg-gray-50 px-5 py-3">
-								<div className="text-sm text-gray-500">
-									No active sessions
-								</div>
+								<div className="text-sm text-gray-500">No active sessions</div>
 							</div>
 						</div>
 
@@ -119,7 +121,9 @@ export default function Index({}: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
+												aria-label="Time icon"
 											>
+												<title>Time</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -144,9 +148,7 @@ export default function Index({}: Route.ComponentProps) {
 								</div>
 							</div>
 							<div className="bg-gray-50 px-5 py-3">
-								<div className="text-sm text-gray-500">
-									No data yet
-								</div>
+								<div className="text-sm text-gray-500">No data yet</div>
 							</div>
 						</div>
 					</div>

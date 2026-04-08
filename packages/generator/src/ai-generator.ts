@@ -59,25 +59,45 @@ model ${modelName} {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ${module === "users" ? `email     String   @unique
-  name      String?` : ""}
-  ${module === "products" ? `name        String
+  ${
+		module === "users"
+			? `email     String   @unique
+  name      String?`
+			: ""
+	}
+  ${
+		module === "products"
+			? `name        String
   price      Decimal @db.Decimal(10, 2)
   stock      Int     @default(0)
   categoryId String? @map("category_id") @db.Uuid
-  category   Category? @relation(fields: [categoryId], references: [id])` : ""}
-  ${module === "orders" ? `userId    String  @map("user_id") @db.Uuid
+  category   Category? @relation(fields: [categoryId], references: [id])`
+			: ""
+	}
+  ${
+		module === "orders"
+			? `userId    String  @map("user_id") @db.Uuid
   status    String  @default("pending")
   total     Decimal @db.Decimal(10, 2)
-  user      User    @relation(fields: [userId], references: [id])` : ""}
-  ${module === "categories" ? `name      String
+  user      User    @relation(fields: [userId], references: [id])`
+			: ""
+	}
+  ${
+		module === "categories"
+			? `name      String
   slug      String  @unique
-  products  Product[]` : ""}
-  ${module === "subscriptions" ? `userId    String   @map("user_id") @db.Uuid
+  products  Product[]`
+			: ""
+	}
+  ${
+		module === "subscriptions"
+			? `userId    String   @map("user_id") @db.Uuid
   plan      String
   status    String  @default("active")
   expiresAt DateTime @map("expires_at")
-  user      User    @relation(fields: [userId], references: [id])` : ""}
+  user      User    @relation(fields: [userId], references: [id])`
+			: ""
+	}
 
   @@map("${module}")
 }`);
@@ -193,40 +213,80 @@ export const ${modelName}Schema = {
 	}),
 
 	create: z.object({
-		${module === "users" ? `email: z.string().email("Invalid email"),
-		name: z.string().min(1).optional(),` : ""}
-		${module === "products" ? `name: z.string().min(1),
+		${
+			module === "users"
+				? `email: z.string().email("Invalid email"),
+		name: z.string().min(1).optional(),`
+				: ""
+		}
+		${
+			module === "products"
+				? `name: z.string().min(1),
 		price: z.number().positive(),
 		stock: z.number().int().min(0).optional(),
-		categoryId: z.string().uuid().optional(),` : ""}
-		${module === "orders" ? `userId: z.string().uuid(),
+		categoryId: z.string().uuid().optional(),`
+				: ""
+		}
+		${
+			module === "orders"
+				? `userId: z.string().uuid(),
 		total: z.number().positive(),
-		status: z.string().optional(),` : ""}
-		${module === "categories" ? `name: z.string().min(1),
-		slug: z.string().min(1),` : ""}
-		${module === "subscriptions" ? `userId: z.string().uuid(),
+		status: z.string().optional(),`
+				: ""
+		}
+		${
+			module === "categories"
+				? `name: z.string().min(1),
+		slug: z.string().min(1),`
+				: ""
+		}
+		${
+			module === "subscriptions"
+				? `userId: z.string().uuid(),
 		plan: z.string().min(1),
-		expiresAt: z.string().datetime(),` : ""}
+		expiresAt: z.string().datetime(),`
+				: ""
+		}
 	}),
 
 	update: z.object({
-		${module === "users" ? `email: z.string().email().optional(),
-		name: z.string().min(1).optional(),` : ""}
-		${module === "products" ? `name: z.string().min(1).optional(),
+		${
+			module === "users"
+				? `email: z.string().email().optional(),
+		name: z.string().min(1).optional(),`
+				: ""
+		}
+		${
+			module === "products"
+				? `name: z.string().min(1).optional(),
 		price: z.number().positive().optional(),
 		stock: z.number().int().min(0).optional(),
-		categoryId: z.string().uuid().optional(),` : ""}
+		categoryId: z.string().uuid().optional(),`
+				: ""
+		}
 		${module === "orders" ? `status: z.string().optional(),` : ""}
 	}),
 
 	listQuery: z.object({
-		${module === "users" ? `orderBy: z.enum(["createdAt", "email", "name"]).optional(),
-		order: z.enum(["asc", "desc"]).optional(),` : ""}
-		${module === "products" ? `categoryId: z.string().uuid().optional(),
+		${
+			module === "users"
+				? `orderBy: z.enum(["createdAt", "email", "name"]).optional(),
+		order: z.enum(["asc", "desc"]).optional(),`
+				: ""
+		}
+		${
+			module === "products"
+				? `categoryId: z.string().uuid().optional(),
 		minPrice: z.number().optional(),
-		maxPrice: z.number().optional(),` : ""}
-		${module === "orders" ? `userId: z.string().uuid().optional(),
-		status: z.string().optional(),` : ""}
+		maxPrice: z.number().optional(),`
+				: ""
+		}
+		${
+			module === "orders"
+				? `userId: z.string().uuid().optional(),
+		status: z.string().optional(),`
+				: ""
+		}
 	}),
 };
 `,
@@ -258,13 +318,21 @@ export type Update${modelName}Input = z.infer<typeof ${modelName}Schema.update>;
 export async function list${modelName}(query: List${modelName}Query) {
 	return prisma.${modelName}.findMany({
 		where: {
-			${module === "products" ? `categoryId: query.categoryId,
+			${
+				module === "products"
+					? `categoryId: query.categoryId,
 			price: {
 				gte: query.minPrice,
 				lte: query.maxPrice,
-			},` : ""}
-			${module === "orders" ? `userId: query.userId,
-			status: query.status as string | undefined,` : ""}
+			},`
+					: ""
+			}
+			${
+				module === "orders"
+					? `userId: query.userId,
+			status: query.status as string | undefined,`
+					: ""
+			}
 		},
 		orderBy: { createdAt: query.order || "desc" },
 	});
@@ -410,7 +478,7 @@ export interface PaginatedResponse<T> {
 			content: JSON.stringify(
 				{
 					extends: "../../tsconfig.json",
-				compilerOptions: {
+					compilerOptions: {
 						outDir: "./dist",
 						rootDir: "./src",
 					},

@@ -57,9 +57,7 @@ export function createProjectZip(
 /**
  * Get zip file metadata without creating the zip
  */
-export function getZipMetadata(
-	files: GeneratedFile[],
-): {
+export function getZipMetadata(files: GeneratedFile[]): {
 	totalFiles: number;
 	totalSize: number;
 	bySource: {
@@ -111,7 +109,7 @@ export async function writeZipToFile(
 	outputPath: string,
 	projectName: string = "project",
 ): Promise<void> {
-	const { writeFile } = await import("fs/promises");
+	const { writeFile } = await import("node:fs/promises");
 	const zipBuffer = createProjectZip(files, projectName);
 	await writeFile(outputPath, zipBuffer);
 }
@@ -119,9 +117,7 @@ export async function writeZipToFile(
 /**
  * Extract files from a zip buffer
  */
-export function extractFromZip(
-	zipBuffer: Buffer,
-): {
+export function extractFromZip(zipBuffer: Buffer): {
 	files: GeneratedFile[];
 	metadata: {
 		generatedAt: string;
@@ -164,7 +160,16 @@ export function extractFromZip(
 		const relativePath = pathParts.join("/");
 
 		// Determine if binary
-		const binaryExtensions = [".ico", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".woff", ".woff2"];
+		const binaryExtensions = [
+			".ico",
+			".png",
+			".jpg",
+			".jpeg",
+			".gif",
+			".webp",
+			".woff",
+			".woff2",
+		];
 		const isBinary = binaryExtensions.some((ext) => relativePath.endsWith(ext));
 
 		let content: string;

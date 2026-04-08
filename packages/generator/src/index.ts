@@ -76,25 +76,33 @@ export interface ListProjectsQuery {
 // Core Functions (implemented in separate modules)
 // ============================================================================
 
-export { loadTemplateFiles, loadTemplateComponent, loadTemplateFile } from "./template-loader.js";
+export {
+	generateMockModules,
+	generateMockPrismaSchema,
+	generateMockTypes,
+} from "./ai-generator.js";
 export {
 	buildProjectStructure,
-	transformTemplatePaths,
-	validateProjectName,
-	sanitizeProjectName,
+	generateRootConfigFiles,
 	getFolderStructure,
 	isValidOutputPath,
-	generateRootConfigFiles,
+	sanitizeProjectName,
+	transformTemplatePaths,
+	validateProjectName,
 } from "./builder.js";
 export {
-	mergeTemplateWithAI,
-	markFilesAsModified,
+	applySelectiveOverrides,
 	filterFilesBySource,
 	getMergeStats,
+	markFilesAsModified,
+	mergeTemplateWithAI,
 	mergeWithConflictTracking,
-	applySelectiveOverrides,
-	validateMergeResult,
 	REQUIRED_PROJECT_FILES,
+	validateMergeResult,
 } from "./merge.js";
-export { generateMockPrismaSchema, generateMockModules, generateMockTypes } from "./ai-generator.js";
+export {
+	loadTemplateComponent,
+	loadTemplateFile,
+	loadTemplateFiles,
+} from "./template-loader.js";
 export { createProjectZip, getZipMetadata } from "./zipper.js";
