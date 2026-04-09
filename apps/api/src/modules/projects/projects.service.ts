@@ -78,17 +78,11 @@ export async function getProject(id: string) {
 /**
  * Create a new project with an initial version
  * Uses a transaction to ensure atomicity
- * Note: For MVP, uses a default user_id since auth is skipped
  */
 export async function createProject(data: CreateProjectInput) {
-	// Default user ID for MVP (no auth)
-	// TODO: Replace with authenticated user_id when auth is implemented
-	const DEFAULT_USER_ID = "00000000-0000-0000-0000-000000000000";
-
 	const result = await prisma.$transaction(async (tx) => {
 		const project = await tx.projects.create({
 			data: {
-				user_id: DEFAULT_USER_ID,
 				name: data.name,
 				description: data.description,
 			},

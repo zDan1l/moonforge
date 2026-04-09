@@ -15,35 +15,19 @@ datasource db {
 // MoonForge Database Models
 // ============================================================================
 
-/// User accounts for authentication and ownership
-model users {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  name      String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  projects  projects[]
-
-  @@map("users")
-}
-
 /// User projects with metadata and status tracking
 model projects {
   id          String   @id @default(uuid()) @db.Uuid
-  user_id     String   @db.Uuid
   name        String
   description String   @db.Text
   status      project_status @default(draft)
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  user        users            @relation(fields: [user_id], references: [id], onDelete: Cascade)
   versions    project_versions[]
   files       project_files[]
   messages    chat_messages[]
 
-  @@index([user_id])
   @@map("projects")
 }
 

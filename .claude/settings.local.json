@@ -42,7 +42,9 @@
 			"Bash(taskkill:*)",
 			"Bash(cmd.exe:*)",
 			"Bash(npx tsx:*)",
-			"Bash(npx @biomejs/biome check src/routes/index.tsx)"
+			"Bash(npx prisma:*)",
+			"Bash(psql:*)",
+			"Bash(jobs)"
 		]
 	}
 }
