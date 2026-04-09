@@ -6,6 +6,7 @@ import { prisma } from "./lib/prisma.js";
 import { success } from "./lib/response.js";
 
 import { corsMiddleware } from "./middleware/cors.js";
+import { debugLogsMiddleware } from "./middleware/debug-logs.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { loggerMiddleware } from "./middleware/logger.js";
 import generateRoutes from "./modules/generate/generate.routes.js";
@@ -21,10 +22,11 @@ const app = new Hono();
 
 // ============================================================================
 // Middleware Pipeline
-// Order: Logger → CORS → Route Handlers → Error Handler
+// Order: Logger → Debug Logs → CORS → Route Handlers → Error Handler
 // ============================================================================
 
 app.use("*", loggerMiddleware);
+app.use("*", debugLogsMiddleware);
 app.use("*", corsMiddleware);
 app.onError(errorHandler);
 

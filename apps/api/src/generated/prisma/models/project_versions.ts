@@ -386,6 +386,11 @@ export type Project_versionsScalarRelationFilter = {
   isNot?: Prisma.project_versionsWhereInput
 }
 
+export type Project_versionsNullableScalarRelationFilter = {
+  is?: Prisma.project_versionsWhereInput | null
+  isNot?: Prisma.project_versionsWhereInput | null
+}
+
 export type project_versionsCreateNestedManyWithoutProjectInput = {
   create?: Prisma.XOR<Prisma.project_versionsCreateWithoutProjectInput, Prisma.project_versionsUncheckedCreateWithoutProjectInput> | Prisma.project_versionsCreateWithoutProjectInput[] | Prisma.project_versionsUncheckedCreateWithoutProjectInput[]
   connectOrCreate?: Prisma.project_versionsCreateOrConnectWithoutProjectInput | Prisma.project_versionsCreateOrConnectWithoutProjectInput[]
@@ -460,10 +465,12 @@ export type project_versionsCreateNestedOneWithoutMessagesInput = {
   connect?: Prisma.project_versionsWhereUniqueInput
 }
 
-export type project_versionsUpdateOneRequiredWithoutMessagesNestedInput = {
+export type project_versionsUpdateOneWithoutMessagesNestedInput = {
   create?: Prisma.XOR<Prisma.project_versionsCreateWithoutMessagesInput, Prisma.project_versionsUncheckedCreateWithoutMessagesInput>
   connectOrCreate?: Prisma.project_versionsCreateOrConnectWithoutMessagesInput
   upsert?: Prisma.project_versionsUpsertWithoutMessagesInput
+  disconnect?: Prisma.project_versionsWhereInput | boolean
+  delete?: Prisma.project_versionsWhereInput | boolean
   connect?: Prisma.project_versionsWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.project_versionsUpdateToOneWithWhereWithoutMessagesInput, Prisma.project_versionsUpdateWithoutMessagesInput>, Prisma.project_versionsUncheckedUpdateWithoutMessagesInput>
 }

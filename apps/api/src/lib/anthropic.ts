@@ -54,7 +54,7 @@ export async function sendMessage(
 	const {
 		model = "claude-sonnet-4-7-20250514",
 		messages,
-		maxTokens = 4096,
+		maxTokens = 16384, // Increased to handle larger monorepo structures
 		temperature = 0.7,
 		system,
 	} = options;
@@ -70,6 +70,12 @@ export async function sendMessage(
 		temperature,
 	};
 
+	console.log("[Anthropic] Sending request with maxTokens:", maxTokens);
+	console.log(
+		"[Anthropic] User prompt length:",
+		messages[0]?.content?.length ?? 0,
+	);
+
 	const response = await anthropic.messages.create(requestOptions);
 
 	const textBlock =
@@ -77,8 +83,24 @@ export async function sendMessage(
 			? response.content.find((block) => block.type === "text")
 			: undefined;
 
+	const content = textBlock?.text ?? "";
+
+	// Log token usage - check if response was truncated
+	console.log("[Anthropic] Input tokens:", response.usage.input_tokens);
+	console.log("[Anthropic] Output tokens:", response.usage.output_tokens);
+	console.log("[Anthropic] Max tokens:", maxTokens);
+
+	// Warn if output is close to max tokens (potential truncation)
+	if (response.usage.output_tokens >= maxTokens * 0.95) {
+		console.warn(
+			`[Anthropic] WARNING: Output tokens (${response.usage.output_tokens}) is near maxTokens (${maxTokens}). Response may be truncated!`,
+		);
+	}
+
+	console.log("[Anthropic] Response content length:", content.length);
+
 	return {
-		content: textBlock?.text ?? "",
+		content,
 		usage: {
 			inputTokens: response.usage.input_tokens,
 			outputTokens: response.usage.output_tokens,

@@ -44,7 +44,10 @@
 			"Bash(npx tsx:*)",
 			"Bash(npx prisma:*)",
 			"Bash(psql:*)",
-			"Bash(jobs)"
+			"Bash(jobs)",
+			"Bash(npx tsc:*)",
+			"Bash(timeout 60 sh -c \"pnpm run dev & sleep 5; curl -s -X POST http://localhost:5000/api/generate/setup -H \\\\\"Content-Type: application/json\\\\\" -d \\\\\"{\\\\\\\\\\\\\"projectId\\\\\\\\\\\\\":\\\\\\\\\\\\\"20812fcb-196c-41a7-a6a4-ad624c258148\\\\\\\\\\\\\",\\\\\\\\\\\\\"description\\\\\\\\\\\\\":\\\\\\\\\\\\\"E-commerce\\\\\\\\\\\\\"}\\\\\"\")",
+			"Bash(timeout 90 sh -c \"pnpm run dev & sleep 7; curl -s -X POST http://localhost:5000/api/projects -H \\\\\"Content-Type: application/json\\\\\" -d \\\\\"{\\\\\\\\\\\\\"name\\\\\\\\\\\\\":\\\\\\\\\\\\\"Test4\\\\\\\\\\\\\",\\\\\\\\\\\\\"description\\\\\\\\\\\\\":\\\\\\\\\\\\\"SaaS\\\\\\\\\\\\\"}\\\\\" | grep -o \\\\\"\\\\\\\\\\\\\"id\\\\\\\\\\\\\":\\\\\\\\\\\\\"[^\\\\\\\\\\\\\"]*\\\\\\\\\\\\\"\\\\\" | head -1 && echo \\\\\"Setup result:\\\\\" && curl -s -X POST http://localhost:5000/api/generate/setup -H \\\\\"Content-Type: application/json\\\\\" -d \\\\\"{\\\\\\\\\\\\\"projectId\\\\\\\\\\\\\":\\\\\\\\\\\\\"fbbc4135-71a6-46e9-bfb1-224e22d677f6\\\\\\\\\\\\\",\\\\\\\\\\\\\"description\\\\\\\\\\\\\":\\\\\\\\\\\\\"SaaS platform\\\\\\\\\\\\\"}\\\\\"\")"
 		]
 	}
 }

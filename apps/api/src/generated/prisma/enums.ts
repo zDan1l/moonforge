@@ -11,6 +11,8 @@
 
 export const project_status = {
   draft: 'draft',
+  template: 'template',
+  scanned: 'scanned',
   generated: 'generated',
   refined: 'refined'
 } as const

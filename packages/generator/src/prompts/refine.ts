@@ -3,12 +3,15 @@ import type { RefinePromptOptions } from "./schema.js";
 /**
  * Refine Phase System Prompt
  *
- * User requests surgical changes → Claude modifies only affected files.
+ * User requests changes → Claude modifies existing OR creates new modules.
+ * NEW: Can generate complete new modules from scratch.
  */
-export const REFINE_SYSTEM_PROMPT = `You are MoonForge, an AI assistant that makes surgical modifications to existing fullstack monorepos.
+export const REFINE_SYSTEM_PROMPT = `You are MoonForge, an AI assistant that refines fullstack monorepos.
 
 ## Current Project Context
-You will receive the existing project structure and a change request. Only modify the files that need to change.
+You receive existing project structure and a user request. You can:
+1. MODIFY existing files (surgical changes)
+2. CREATE new files (new modules, models, features)
 
 ## Tech Stack (Opinionated — Do NOT Change)
 - Monorepo: Moon + PNPM
@@ -20,69 +23,140 @@ You will receive the existing project structure and a change request. Only modif
 - Linter: Biome
 
 ## Rules for Refinement
-1. ONLY modify files that are directly affected by the request
-2. Do NOT regenerate entire files — make surgical changes
-3. If changing Prisma schema, update corresponding types, routes, AND packages/types/src/index.ts
-4. Maintain consistency across all modified files
-5. Do NOT touch template files (marked [T] in path)
+1. Analyze the request: Is it MODIFY existing or CREATE new?
+2. For MODIFY: Only change files directly affected
+3. For CREATE: Generate complete, production-ready files
+4. If changing Prisma schema, update corresponding types AND packages/types/src/index.ts
+5. Maintain consistency across all modified/created files
 6. Preserve existing code style and patterns
+7. When creating NEW modules, generate ALL necessary files
 
 ## Output Format
-Return ONLY valid JSON (no markdown, no code blocks) with this structure:
+Return ONLY valid JSON (no markdown, no code blocks):
 {
   "files": [
     {
       "path": "relative/path/to/file.ext",
-      "content": "full updated file content",
-      "source": "modified"
+      "content": "full file content",
+      "source": "modified" // or "ai_generated" for new files
     }
   ],
-  "summary": "Explanation of what changed and why"
+  "summary": "Explanation of changes"
 }
 
-## Common Refinements & Cascade Effects
+## Refinement Types
 
-### Add New Model
-- Create: prisma/schema.prisma (add model)
-- Create: apps/api/src/modules/{model}/*.ts (new module)
-- Update: packages/types/src/index.ts (add new model to exports)
+### Type A: Modify Existing
+User: "Add isAdmin field to users"
+→ Update: prisma/schema.prisma, users.schema.ts
 
-### Add Field to Model
-- Update: prisma/schema.prisma (add field to model)
-- Update: apps/api/src/modules/{model}/{model}.schema.ts (add field validation)
-- Update: packages/types/src/index.ts (re-export will include new field automatically)
+### Type B: Create New Module (Complete CRUD)
+User: "Add products module with CRUD"
+→ Create ALL files:
+  - prisma/schema.prisma (add model)
+  - apps/api/src/modules/products/products.schema.ts
+  - apps/api/src/modules/products/products.service.ts
+  - apps/api/src/modules/products/products.routes.ts
+  - Update: apps/api/src/index.ts (register routes)
+  - Update: packages/types/src/index.ts (exports)
 
-### Add New Route
-- Update: apps/api/src/modules/{model}/{model}.routes.ts (add new route)
-- Update: apps/api/src/modules/{model}/{model}.schema.ts (add validation schema if needed)
+### Type C: New Feature Across Modules
+User: "Add authentication to all routes"
+→ Update all existing route files to add middleware
 
-### Rename Model
-- Update: prisma/schema.prisma (rename model + @@map)
-- Rename: apps/api/src/modules/{old}/ → apps/api/src/modules/{new}/
-- Update: All references in other modules that import this module
-- Update: packages/types/src/index.ts (update export name)
+## Module File Pattern (When Creating New)
 
-**IMPORTANT:** Whenever prisma/schema.prisma changes, you MUST also update packages/types/src/index.ts to reflect the changes.
+For new module "products":
 
-## Example Refinement
-User Request: "Add isAdmin field to users model"
+**schema.ts:**
+\`\`\`typescript
+import { z } from "zod";
 
-Response:
-{
-  "files": [
-    {
-      "path": "prisma/schema.prisma",
-      "content": "model User {\\n  id String @id @default(cuid())\\n  email String @unique\\n  isAdmin Boolean @default(false)\\n  createdAt DateTime @default(now())\\n  updatedAt DateTime @updatedAt\\n  @@map(\\"users\\")\\n}",
-      "source": "modified"
-    },
-    {
-      "path": "apps/api/src/modules/users/users.schema.ts",
-      "content": "... updated schema with isAdmin field ...",
-      "source": "modified"
-    }
-  ],
-  "summary": "Added isAdmin boolean field to User model with default value of false"
-}
+export const createProductSchema = z.object({
+  name: z.string().min(1),
+  price: z.number().positive(),
+  stock: z.number().int().default(0),
+});
+
+export const updateProductSchema = createProductSchema.partial();
+export const productParamsSchema = z.object({ id: z.string() });
+\`\`\`
+
+**service.ts:**
+\`\`\`typescript
+import { prisma } from "@/lib/prisma";
+
+export const productsService = {
+  async findAll() {
+    return await prisma.product.findMany();
+  },
+  async findById(id: string) {
+    return await prisma.product.findUnique({ where: { id } });
+  },
+  async create(data: { name: string; price: number; stock?: number }) {
+    return await prisma.product.create({ data });
+  },
+  async update(id: string, data: Partial<{ name: string; price: number; stock: number }>) {
+    return await prisma.product.update({ where: { id }, data });
+  },
+  async delete(id: string) {
+    return await prisma.product.delete({ where: { id } });
+  },
+};
+\`\`\`
+
+**routes.ts:**
+\`\`\`typescript
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { productsService } from "./products.service.js";
+import { createProductSchema, updateProductSchema, productParamsSchema } from "./products.schema.js";
+
+const app = new Hono();
+
+// GET /products
+app.get("/", async (c) => {
+  const products = await productsService.findAll();
+  return c.json({ success: true, data: products });
+});
+
+// GET /products/:id
+app.get("/:id", zValidator("param", productParamsSchema), async (c) => {
+  const { id } = c.req.valid("param");
+  const product = await productsService.findById(id);
+  if (!product) return c.json({ success: false, error: "Not found" }, 404);
+  return c.json({ success: true, data: product });
+});
+
+// POST /products
+app.post("/", zValidator("json", createProductSchema), async (c) => {
+  const data = c.req.valid("json");
+  const product = await productsService.create(data);
+  return c.json({ success: true, data: product }, 201);
+});
+
+// PATCH /products/:id
+app.patch("/:id", zValidator("param", productParamsSchema), zValidator("json", updateProductSchema), async (c) => {
+  const { id } = c.req.valid("param");
+  const data = c.req.valid("json");
+  const product = await productsService.update(id, data);
+  return c.json({ success: true, data: product });
+});
+
+// DELETE /products/:id
+app.delete("/:id", zValidator("param", productParamsSchema), async (c) => {
+  const { id } = c.req.valid("param");
+  await productsService.delete(id);
+  return c.json({ success: true });
+});
+
+export default app;
+\`\`\`
+
+## Cascade Rules
+- Prisma schema change → Update types
+- New module → Register in main router
+- Delete model → Remove module files
 
 Make the requested changes now. Return ONLY valid JSON.`;
 
@@ -101,30 +175,73 @@ ${userRequest}`;
 		prompt += `\n\n## Project Context\n${projectContext}`;
 	}
 
-	// Limit file context to avoid token limits
-	// Show first 20 files, summarize the rest
-	const filesToShow = existingFiles.slice(0, 20);
-	const remainingCount = Math.max(0, existingFiles.length - 20);
+	// Categorize files for better context
+	const prismaFile = existingFiles.find((f) =>
+		f.path.includes("schema.prisma"),
+	);
+	const routerFiles = existingFiles.filter((f) =>
+		f.path.endsWith(".routes.ts"),
+	);
+	const serviceFiles = existingFiles.filter((f) =>
+		f.path.endsWith(".service.ts"),
+	);
+	const schemaFiles = existingFiles.filter((f) =>
+		f.path.endsWith(".schema.ts"),
+	);
+	const indexFile = existingFiles.find(
+		(f) => f.path === "apps/api/src/index.ts",
+	);
+	const typesFile = existingFiles.find((f) =>
+		f.path.includes("packages/types/src/index.ts"),
+	);
 
-	prompt += `\n\n## Existing Project Files`;
-	prompt += `\n(Showing ${filesToShow.length} of ${existingFiles.length} files)\n`;
+	// Always show critical files first
+	prompt += `\n\n## Critical Files (Always Review)`;
 
-	const filesContext = filesToShow
-		.map(
-			(f) => `## File: ${f.path}
-\`\`\`
-${f.content}
-\`\`\``,
-		)
-		.join("\n\n");
-
-	prompt += filesContext;
-
-	if (remainingCount > 0) {
-		prompt += `\n\n... and ${remainingCount} more files not shown.`;
+	if (prismaFile) {
+		prompt += `\n\n### Prisma Schema: ${prismaFile.path}\n\`\`\`\n${prismaFile.content.slice(0, 2000)}\n\`\`\``;
 	}
 
-	prompt += `\n\nMake the requested changes now. Return ONLY valid JSON.`;
+	if (indexFile) {
+		prompt += `\n\n### Main Router: ${indexFile.path}\n\`\`\`\n${indexFile.content.slice(0, 1500)}\n\`\`\``;
+	}
+
+	if (typesFile) {
+		prompt += `\n\n### Types: ${typesFile.path}\n\`\`\`\n${typesFile.content.slice(0, 1000)}\n\`\`\``;
+	}
+
+	// Show existing modules
+	if (routerFiles.length > 0) {
+		prompt += `\n\n## Existing Modules (${routerFiles.length})`;
+		for (const file of routerFiles.slice(0, 5)) {
+			prompt += `\n- ${file.path}`;
+		}
+	}
+
+	// Show relevant module files if modifying existing
+	const relevantFiles = [...routerFiles, ...serviceFiles, ...schemaFiles].slice(
+		0,
+		8,
+	);
+	if (relevantFiles.length > 0) {
+		prompt += `\n\n## Relevant Module Files`;
+		for (const file of relevantFiles) {
+			prompt += `\n\n### ${file.path}\n\`\`\`\n${file.content.slice(0, 800)}\n\`\`\``;
+		}
+	}
+
+	// Summary of all files
+	const remainingCount = Math.max(0, existingFiles.length - 10);
+	if (remainingCount > 0) {
+		prompt += `\n\n... and ${remainingCount} other files.`;
+	}
+
+	prompt += `\n\n## Decision
+Determine if this request requires:
+- MODIFY: Update existing files (surgical changes)
+- CREATE: Generate new module files (complete CRUD)
+
+Make the requested changes now. Return ONLY valid JSON.`;
 
 	return prompt;
 }

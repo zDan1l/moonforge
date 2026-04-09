@@ -21,7 +21,8 @@ export const SETUP_SYSTEM_PROMPT = `You are MoonForge, an AI assistant that gene
 Generate a complete monorepo structure based on the user's description.
 
 ## Output Format
-Return ONLY valid JSON (no markdown, no code blocks) with this structure:
+Return your response as a JSON code block:
+\`\`\`json
 {
   "files": [
     {
@@ -32,6 +33,7 @@ Return ONLY valid JSON (no markdown, no code blocks) with this structure:
   ],
   "summary": "Brief explanation of what was generated"
 }
+\`\`\`
 
 ## Files to Generate
 Based on user's description, generate:

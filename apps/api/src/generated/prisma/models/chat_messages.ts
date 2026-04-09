@@ -158,7 +158,7 @@ export type chat_messagesGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type Chat_messagesGroupByOutputType = {
   id: string
   project_id: string
-  version_id: string
+  version_id: string | null
   role: $Enums.message_role
   content: string
   file_changes: runtime.JsonValue | null
@@ -189,19 +189,19 @@ export type chat_messagesWhereInput = {
   NOT?: Prisma.chat_messagesWhereInput | Prisma.chat_messagesWhereInput[]
   id?: Prisma.UuidFilter<"chat_messages"> | string
   project_id?: Prisma.UuidFilter<"chat_messages"> | string
-  version_id?: Prisma.UuidFilter<"chat_messages"> | string
+  version_id?: Prisma.UuidNullableFilter<"chat_messages"> | string | null
   role?: Prisma.Enummessage_roleFilter<"chat_messages"> | $Enums.message_role
   content?: Prisma.StringFilter<"chat_messages"> | string
   file_changes?: Prisma.JsonNullableFilter<"chat_messages">
   created_at?: Prisma.DateTimeFilter<"chat_messages"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectsScalarRelationFilter, Prisma.projectsWhereInput>
-  version?: Prisma.XOR<Prisma.Project_versionsScalarRelationFilter, Prisma.project_versionsWhereInput>
+  version?: Prisma.XOR<Prisma.Project_versionsNullableScalarRelationFilter, Prisma.project_versionsWhereInput> | null
 }
 
 export type chat_messagesOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   project_id?: Prisma.SortOrder
-  version_id?: Prisma.SortOrder
+  version_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
   file_changes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -216,19 +216,19 @@ export type chat_messagesWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.chat_messagesWhereInput[]
   NOT?: Prisma.chat_messagesWhereInput | Prisma.chat_messagesWhereInput[]
   project_id?: Prisma.UuidFilter<"chat_messages"> | string
-  version_id?: Prisma.UuidFilter<"chat_messages"> | string
+  version_id?: Prisma.UuidNullableFilter<"chat_messages"> | string | null
   role?: Prisma.Enummessage_roleFilter<"chat_messages"> | $Enums.message_role
   content?: Prisma.StringFilter<"chat_messages"> | string
   file_changes?: Prisma.JsonNullableFilter<"chat_messages">
   created_at?: Prisma.DateTimeFilter<"chat_messages"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectsScalarRelationFilter, Prisma.projectsWhereInput>
-  version?: Prisma.XOR<Prisma.Project_versionsScalarRelationFilter, Prisma.project_versionsWhereInput>
+  version?: Prisma.XOR<Prisma.Project_versionsNullableScalarRelationFilter, Prisma.project_versionsWhereInput> | null
 }, "id">
 
 export type chat_messagesOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   project_id?: Prisma.SortOrder
-  version_id?: Prisma.SortOrder
+  version_id?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
   content?: Prisma.SortOrder
   file_changes?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -244,7 +244,7 @@ export type chat_messagesScalarWhereWithAggregatesInput = {
   NOT?: Prisma.chat_messagesScalarWhereWithAggregatesInput | Prisma.chat_messagesScalarWhereWithAggregatesInput[]
   id?: Prisma.UuidWithAggregatesFilter<"chat_messages"> | string
   project_id?: Prisma.UuidWithAggregatesFilter<"chat_messages"> | string
-  version_id?: Prisma.UuidWithAggregatesFilter<"chat_messages"> | string
+  version_id?: Prisma.UuidNullableWithAggregatesFilter<"chat_messages"> | string | null
   role?: Prisma.Enummessage_roleWithAggregatesFilter<"chat_messages"> | $Enums.message_role
   content?: Prisma.StringWithAggregatesFilter<"chat_messages"> | string
   file_changes?: Prisma.JsonNullableWithAggregatesFilter<"chat_messages">
@@ -258,13 +258,13 @@ export type chat_messagesCreateInput = {
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
   project: Prisma.projectsCreateNestedOneWithoutMessagesInput
-  version: Prisma.project_versionsCreateNestedOneWithoutMessagesInput
+  version?: Prisma.project_versionsCreateNestedOneWithoutMessagesInput
 }
 
 export type chat_messagesUncheckedCreateInput = {
   id?: string
   project_id: string
-  version_id: string
+  version_id?: string | null
   role: $Enums.message_role
   content: string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -278,13 +278,13 @@ export type chat_messagesUpdateInput = {
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.projectsUpdateOneRequiredWithoutMessagesNestedInput
-  version?: Prisma.project_versionsUpdateOneRequiredWithoutMessagesNestedInput
+  version?: Prisma.project_versionsUpdateOneWithoutMessagesNestedInput
 }
 
 export type chat_messagesUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   project_id?: Prisma.StringFieldUpdateOperationsInput | string
-  version_id?: Prisma.StringFieldUpdateOperationsInput | string
+  version_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enummessage_roleFieldUpdateOperationsInput | $Enums.message_role
   content?: Prisma.StringFieldUpdateOperationsInput | string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -294,7 +294,7 @@ export type chat_messagesUncheckedUpdateInput = {
 export type chat_messagesCreateManyInput = {
   id?: string
   project_id: string
-  version_id: string
+  version_id?: string | null
   role: $Enums.message_role
   content: string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -312,7 +312,7 @@ export type chat_messagesUpdateManyMutationInput = {
 export type chat_messagesUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   project_id?: Prisma.StringFieldUpdateOperationsInput | string
-  version_id?: Prisma.StringFieldUpdateOperationsInput | string
+  version_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enummessage_roleFieldUpdateOperationsInput | $Enums.message_role
   content?: Prisma.StringFieldUpdateOperationsInput | string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -451,12 +451,12 @@ export type chat_messagesCreateWithoutProjectInput = {
   content: string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
-  version: Prisma.project_versionsCreateNestedOneWithoutMessagesInput
+  version?: Prisma.project_versionsCreateNestedOneWithoutMessagesInput
 }
 
 export type chat_messagesUncheckedCreateWithoutProjectInput = {
   id?: string
-  version_id: string
+  version_id?: string | null
   role: $Enums.message_role
   content: string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -495,7 +495,7 @@ export type chat_messagesScalarWhereInput = {
   NOT?: Prisma.chat_messagesScalarWhereInput | Prisma.chat_messagesScalarWhereInput[]
   id?: Prisma.UuidFilter<"chat_messages"> | string
   project_id?: Prisma.UuidFilter<"chat_messages"> | string
-  version_id?: Prisma.UuidFilter<"chat_messages"> | string
+  version_id?: Prisma.UuidNullableFilter<"chat_messages"> | string | null
   role?: Prisma.Enummessage_roleFilter<"chat_messages"> | $Enums.message_role
   content?: Prisma.StringFilter<"chat_messages"> | string
   file_changes?: Prisma.JsonNullableFilter<"chat_messages">
@@ -548,7 +548,7 @@ export type chat_messagesUpdateManyWithWhereWithoutVersionInput = {
 
 export type chat_messagesCreateManyProjectInput = {
   id?: string
-  version_id: string
+  version_id?: string | null
   role: $Enums.message_role
   content: string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -561,12 +561,12 @@ export type chat_messagesUpdateWithoutProjectInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  version?: Prisma.project_versionsUpdateOneRequiredWithoutMessagesNestedInput
+  version?: Prisma.project_versionsUpdateOneWithoutMessagesNestedInput
 }
 
 export type chat_messagesUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  version_id?: Prisma.StringFieldUpdateOperationsInput | string
+  version_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enummessage_roleFieldUpdateOperationsInput | $Enums.message_role
   content?: Prisma.StringFieldUpdateOperationsInput | string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -575,7 +575,7 @@ export type chat_messagesUncheckedUpdateWithoutProjectInput = {
 
 export type chat_messagesUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  version_id?: Prisma.StringFieldUpdateOperationsInput | string
+  version_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.Enummessage_roleFieldUpdateOperationsInput | $Enums.message_role
   content?: Prisma.StringFieldUpdateOperationsInput | string
   file_changes?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
@@ -629,7 +629,7 @@ export type chat_messagesSelect<ExtArgs extends runtime.Types.Extensions.Interna
   file_changes?: boolean
   created_at?: boolean
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }, ExtArgs["result"]["chat_messages"]>
 
 export type chat_messagesSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -641,7 +641,7 @@ export type chat_messagesSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   file_changes?: boolean
   created_at?: boolean
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }, ExtArgs["result"]["chat_messages"]>
 
 export type chat_messagesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -653,7 +653,7 @@ export type chat_messagesSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   file_changes?: boolean
   created_at?: boolean
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }, ExtArgs["result"]["chat_messages"]>
 
 export type chat_messagesSelectScalar = {
@@ -669,27 +669,27 @@ export type chat_messagesSelectScalar = {
 export type chat_messagesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "project_id" | "version_id" | "role" | "content" | "file_changes" | "created_at", ExtArgs["result"]["chat_messages"]>
 export type chat_messagesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }
 export type chat_messagesIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }
 export type chat_messagesIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.projectsDefaultArgs<ExtArgs>
-  version?: boolean | Prisma.project_versionsDefaultArgs<ExtArgs>
+  version?: boolean | Prisma.chat_messages$versionArgs<ExtArgs>
 }
 
 export type $chat_messagesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "chat_messages"
   objects: {
     project: Prisma.$projectsPayload<ExtArgs>
-    version: Prisma.$project_versionsPayload<ExtArgs>
+    version: Prisma.$project_versionsPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     project_id: string
-    version_id: string
+    version_id: string | null
     role: $Enums.message_role
     content: string
     file_changes: runtime.JsonValue | null
@@ -1089,7 +1089,7 @@ readonly fields: chat_messagesFieldRefs;
 export interface Prisma__chat_messagesClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.projectsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.projectsDefaultArgs<ExtArgs>>): Prisma.Prisma__projectsClient<runtime.Types.Result.GetResult<Prisma.$projectsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  version<T extends Prisma.project_versionsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.project_versionsDefaultArgs<ExtArgs>>): Prisma.Prisma__project_versionsClient<runtime.Types.Result.GetResult<Prisma.$project_versionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  version<T extends Prisma.chat_messages$versionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.chat_messages$versionArgs<ExtArgs>>): Prisma.Prisma__project_versionsClient<runtime.Types.Result.GetResult<Prisma.$project_versionsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1524,6 +1524,25 @@ export type chat_messagesDeleteManyArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many chat_messages to delete.
    */
   limit?: number
+}
+
+/**
+ * chat_messages.version
+ */
+export type chat_messages$versionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the project_versions
+   */
+  select?: Prisma.project_versionsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the project_versions
+   */
+  omit?: Prisma.project_versionsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.project_versionsInclude<ExtArgs> | null
+  where?: Prisma.project_versionsWhereInput
 }
 
 /**

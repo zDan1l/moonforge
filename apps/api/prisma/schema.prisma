@@ -8,7 +8,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 // ============================================================================
@@ -91,6 +90,8 @@ model chat_messages {
 
 enum project_status {
   draft
+  template
+  scanned
   generated
   refined
 }

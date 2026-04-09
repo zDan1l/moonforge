@@ -22,6 +22,13 @@ export interface ApiResponse<T> {
 	};
 }
 
+// Debug log type from backend
+export interface DebugLog {
+	level: "log" | "info" | "warn" | "error";
+	message: string;
+	timestamp: string;
+}
+
 export interface ApiError {
 	success: false;
 	error: {
@@ -155,6 +162,9 @@ async function apiRequest<T>(
 		...options,
 	});
 
+	// Extract and display debug logs from backend
+	displayDebugLogs(response.headers);
+
 	// Check if response is JSON
 	const contentType = response.headers.get("content-type");
 	if (!contentType?.includes("application/json")) {
@@ -173,6 +183,58 @@ async function apiRequest<T>(
 	}
 
 	return data.data;
+}
+
+/**
+ * Extract and display debug logs from response headers
+ */
+function displayDebugLogs(headers: Headers): void {
+	const count = headers.get("X-Debug-Logs-Count");
+	if (!count || parseInt(count, 10) === 0) {
+		return;
+	}
+
+	const logCount = parseInt(count, 10);
+	console.group(
+		`%c🔍 Backend Debug Logs (${logCount} entries)`,
+		"color: #8b5cf6; font-weight: bold;",
+	);
+
+	// Collect all chunks
+	let logsJson = "";
+	let i = 0;
+	while (true) {
+		const chunk = headers.get(`X-Debug-Logs-${i}`);
+		if (!chunk) break;
+		logsJson += chunk;
+		i++;
+	}
+
+	if (!logsJson) {
+		console.warn("Failed to read debug logs from headers");
+		console.groupEnd();
+		return;
+	}
+
+	try {
+		const logs = JSON.parse(logsJson) as DebugLog[];
+
+		for (const log of logs) {
+			const style = {
+				log: "color: #3b82f6", // blue
+				info: "color: #10b981", // green
+				warn: "color: #f59e0b", // yellow
+				error: "color: #ef4444", // red
+			}[log.level];
+
+			const prefix = `%c[${log.level.toUpperCase()}]`;
+			console.log(prefix, style, log.message);
+		}
+	} catch (e) {
+		console.error("Failed to parse debug logs:", e);
+	}
+
+	console.groupEnd();
 }
 
 // API client methods
