@@ -8,6 +8,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 // ============================================================================
@@ -70,14 +71,14 @@ model project_files {
 model chat_messages {
   id          String   @id @default(uuid()) @db.Uuid
   project_id  String   @db.Uuid
-  version_id  String   @db.Uuid
+  version_id  String?  @db.Uuid
   role        message_role
   content     String   @db.Text
   file_changes Json?
   created_at  DateTime @default(now())
 
   project     projects          @relation(fields: [project_id], references: [id], onDelete: Cascade)
-  version     project_versions  @relation(fields: [version_id], references: [id], onDelete: Cascade)
+  version     project_versions? @relation(fields: [version_id], references: [id], onDelete: Cascade)
 
   @@index([project_id])
   @@index([version_id])

@@ -11,6 +11,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { success } from "../../lib/response.js";
 import {
+	diffQuerySchema,
 	downloadQuerySchema,
 	filePathParamSchema,
 	listFilesQuerySchema,
@@ -20,6 +21,8 @@ import {
 	generateProjectZip,
 	getFile,
 	getFileCount,
+	getFileDiff,
+	getVersionDiff,
 	listFiles,
 } from "./files.service.js";
 
@@ -152,6 +155,53 @@ files.get(
 		const count = await getFileCount(projectId, versionId);
 
 		return c.json(success({ count }), 200);
+	},
+);
+
+/**
+ * GET /api/projects/:projectId/diff
+ *
+ * Get diff between two versions of a project.
+ *
+ * @example
+ * Request: GET /api/projects/123/diff?baseVersionId=abc&targetVersionId=def
+ * Response (200):
+ * {
+ *   "success": true,
+ *   "data": {
+ *     "baseVersionId": "abc",
+ *     "targetVersionId": "def",
+ *     "files": [...],
+ *     "summary": { "total": 10, "added": 2, "deleted": 0, "modified": 3, "unchanged": 5 }
+ *   }
+ * }
+ */
+files.get(
+	"/:projectId/diff",
+	zValidator("param", projectIdParamSchema),
+	zValidator("query", diffQuerySchema),
+	async (c) => {
+		const { projectId } = c.req.valid("param");
+		const { baseVersionId, targetVersionId, filePath } = c.req.valid("query");
+
+		if (filePath) {
+			// Single file diff
+			const diff = await getFileDiff(
+				projectId,
+				baseVersionId,
+				targetVersionId,
+				filePath,
+			);
+			return c.json(success(diff), 200);
+		}
+
+		// Full version diff
+		const diff = await getVersionDiff(
+			projectId,
+			baseVersionId,
+			targetVersionId,
+		);
+		return c.json(success(diff), 200);
 	},
 );
 

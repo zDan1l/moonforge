@@ -47,3 +47,14 @@ export const downloadQuerySchema = z.object({
 });
 
 export type DownloadQuery = z.infer<typeof downloadQuerySchema>;
+
+/**
+ * Schema for diff query parameters
+ */
+export const diffQuerySchema = z.object({
+	baseVersionId: z.string().uuid("Invalid base version ID format"),
+	targetVersionId: z.string().uuid("Invalid target version ID format"),
+	filePath: z.string().min(1, "File path is required").optional(),
+});
+
+export type DiffQuery = z.infer<typeof diffQuerySchema>;
