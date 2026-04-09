@@ -31,6 +31,10 @@ export interface SetupResult {
 	versionNumber: number;
 	filesGenerated: number;
 	summary: string;
+	fileChanges: Record<
+		string,
+		{ path: string; change: "created" | "modified" | "deleted" }
+	>;
 }
 
 export interface RefineResult {
@@ -39,6 +43,10 @@ export interface RefineResult {
 	versionNumber: number;
 	filesChanged: number;
 	summary: string;
+	fileChanges: Record<
+		string,
+		{ path: string; change: "created" | "modified" | "deleted" }
+	>;
 }
 
 export interface GenerateSetupInput {
@@ -77,6 +85,39 @@ function parseClaudeResponse(content: string) {
 	} catch (_error) {
 		throw new AppError("Failed to parse AI response", 500, "PARSE_ERROR");
 	}
+}
+
+/**
+ * Extract file changes from Claude response for tracking
+ */
+function extractFileChanges(
+	files: GeneratedFile[],
+): Record<
+	string,
+	{ path: string; change: "created" | "modified" | "deleted" }
+> {
+	const changes: Record<
+		string,
+		{ path: string; change: "created" | "modified" | "deleted" }
+	> = {};
+
+	for (const file of files) {
+		// Determine change type based on source
+		// template files are never "created" by AI
+		// For new files, assume "created"
+		// For existing files that match template, it's a template copy
+		// For files that were modified by AI, they come from ai_generated or modified
+		const change: "created" | "modified" | "deleted" =
+			file.source === "template"
+				? "created"
+				: file.source === "ai_generated"
+					? "created"
+					: "modified";
+
+		changes[file.path] = { path: file.path, change };
+	}
+
+	return changes;
 }
 
 /**
@@ -192,11 +233,25 @@ export async function generateSetup(
 	// 6. Merge AI files with template and store
 	const mergeResult = await mergeWithTemplate(output.files);
 
+	// Track file changes for chat message
+	const fileChanges = extractFileChanges(mergeResult.files);
+
 	for (const file of mergeResult.files) {
 		await storeFile(version.id, file, projectId);
 	}
 
-	// 7. Update project status
+	// 7. Save assistant message with file changes
+	await prisma.chat_messages.create({
+		data: {
+			project_id: projectId,
+			version_id: version.id,
+			role: "assistant",
+			content: output.summary,
+			file_changes: JSON.parse(JSON.stringify(fileChanges)),
+		},
+	});
+
+	// 8. Update project status
 	await prisma.projects.update({
 		where: { id: projectId },
 		data: { status: "generated" },
@@ -208,6 +263,7 @@ export async function generateSetup(
 		versionNumber,
 		filesGenerated: mergeResult.files.length,
 		summary: output.summary,
+		fileChanges,
 	};
 }
 
@@ -286,6 +342,9 @@ export async function generateRefine(
 	// 8. Merge and apply AI changes
 	const _mergedFiles = mergeForRefine(existingFiles, output.files);
 
+	// Track file changes for chat message
+	const fileChanges = extractFileChanges(output.files);
+
 	// Delete and re-create files that were modified
 	for (const file of output.files) {
 		const normalizedPath = normalizePath(file.path);
@@ -315,7 +374,21 @@ export async function generateRefine(
 		}
 	}
 
-	// 9. Update project status
+	// 9. Save assistant message with file changes
+	await prisma.chat_messages.create({
+		data: {
+			project_id: projectId,
+			version_id: version.id,
+			role: "assistant",
+			content: output.summary,
+			file_changes: JSON.parse(JSON.stringify(fileChanges)),
+		},
+	});
+
+	// 10. Auto-update shared types if Prisma schema changed
+	await autoUpdateSharedTypes(projectId, version.id, output.files);
+
+	// 11. Update project status
 	await prisma.projects.update({
 		where: { id: projectId },
 		data: { status: "refined" },
@@ -327,5 +400,129 @@ export async function generateRefine(
 		versionNumber,
 		filesChanged: output.files.length,
 		summary: output.summary,
+		fileChanges,
 	};
+}
+
+// ============================================================================
+// Auto-Update Shared Types
+// ============================================================================
+
+/**
+ * Auto-update shared types when Prisma schema changes
+ * PRD Section 7.2: "Auto-update shared types setiap ada perubahan Prisma schema"
+ */
+async function autoUpdateSharedTypes(
+	projectId: string,
+	versionId: string,
+	files: GeneratedFile[],
+): Promise<void> {
+	// Check if Prisma schema was modified
+	const prismaSchemaFile = files.find(
+		(f) => f.path === "apps/api/prisma/schema.prisma",
+	);
+
+	if (!prismaSchemaFile) {
+		return;
+	}
+
+	// Find the types/index.ts file in the output
+	const typesIndexFile = files.find(
+		(f) => f.path === "packages/types/src/index.ts",
+	);
+
+	// If there's a types file, regenerate it based on the new schema
+	if (prismaSchemaFile?.content) {
+		const generatedTypes = generateTypesFromSchema(prismaSchemaFile.content);
+
+		if (typesIndexFile) {
+			// Update existing types file
+			await prisma.project_files.updateMany({
+				where: {
+					project_id: projectId,
+					version_id: versionId,
+					path: "packages/types/src/index.ts",
+				},
+				data: { content: generatedTypes, file_source: "modified" },
+			});
+		} else {
+			// Create new types file
+			await prisma.project_files.create({
+				data: {
+					project_id: projectId,
+					version_id: versionId,
+					path: "packages/types/src/index.ts",
+					content: generatedTypes,
+					file_source: "modified",
+				},
+			});
+		}
+	}
+}
+
+/**
+ * Generate TypeScript types from Prisma schema content
+ * Basic implementation - extracts models and generates types
+ */
+function generateTypesFromSchema(schemaContent: string): string {
+	const lines = schemaContent.split("\n");
+	const models: string[] = [];
+	let currentModel: string | null = null;
+	let inModel = false;
+
+	// Extract model names from schema
+	for (const line of lines) {
+		const trimmed = line.trim();
+		if (trimmed.startsWith("model ") && trimmed.endsWith("{")) {
+			const modelName = trimmed.replace("model ", "").replace("{", "").trim();
+			currentModel = modelName;
+			inModel = true;
+		} else if (trimmed === "}") {
+			if (inModel && currentModel) {
+				models.push(currentModel);
+			}
+			inModel = false;
+			currentModel = null;
+		}
+	}
+
+	// Generate TypeScript types
+	const typeDefinitions = models
+		.map((model) => {
+			const typeName = model.charAt(0).toUpperCase() + model.slice(1);
+			return `export type ${typeName} = {\n  id: string;\n  [key: string]: unknown;\n};\n`;
+		})
+		.join("\n");
+
+	return `/**
+ * Auto-generated types from Prisma schema
+ * This file is auto-updated when the Prisma schema changes
+ */
+
+// Re-export Prisma types
+${typeDefinitions}
+
+// Utility types
+export type Json = Record<string, unknown>;
+
+export type PaginatedResult<T> = {
+  items: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+    nextCursor: string | null;
+    hasMore: boolean;
+  };
+};
+
+export type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+  meta?: {
+    timestamp: string;
+  };
+};
+`;
 }

@@ -37,11 +37,12 @@
 			"Bash(pnpm install:*)",
 			"Bash(pnpm:*)",
 			"Bash(find . -name \"schema.prisma\" -exec cat {} \\\\;)",
-			"Bash(bun run:*)",
-			"Bash(npx @biomejs/biome check src/routes/projects/index.tsx)",
-			"Bash(npx @biomejs/biome format --write src/routes/projects/index.tsx)",
-			"Bash(npx @biomejs/biome check src/routes/index.tsx)",
-			"Bash(npx @biomejs/biome format --write src/routes/index.tsx)"
+			"Bash(npm run:*)",
+			"Bash(findstr :5000)",
+			"Bash(taskkill:*)",
+			"Bash(cmd.exe:*)",
+			"Bash(npx tsx:*)",
+			"Bash(npx @biomejs/biome check src/routes/index.tsx)"
 		]
 	}
 }
