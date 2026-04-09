@@ -155,6 +155,16 @@ async function apiRequest<T>(
 		...options,
 	});
 
+	// Check if response is JSON
+	const contentType = response.headers.get("content-type");
+	if (!contentType?.includes("application/json")) {
+		const text = await response.text();
+		throw new Error(
+			`API returned non-JSON response. URL: ${url}. Status: ${response.status}. ` +
+				`Is the backend running? ${text.slice(0, 100)}${text.length > 100 ? "..." : ""}`,
+		);
+	}
+
 	const data = (await response.json()) as ApiResponse<T> | ApiError;
 
 	if (!response.ok || !("success" in data) || !data.success) {

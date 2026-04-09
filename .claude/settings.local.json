@@ -37,7 +37,11 @@
 			"Bash(pnpm install:*)",
 			"Bash(pnpm:*)",
 			"Bash(find . -name \"schema.prisma\" -exec cat {} \\\\;)",
-			"Bash(npm run:*)"
+			"Bash(npm run:*)",
+			"Bash(findstr :5000)",
+			"Bash(taskkill:*)",
+			"Bash(cmd.exe:*)",
+			"Bash(npx tsx:*)"
 		]
 	}
 }
