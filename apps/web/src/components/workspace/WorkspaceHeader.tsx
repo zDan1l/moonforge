@@ -6,6 +6,7 @@
 
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Download } from "lucide-react";
+import { api } from "../../lib/api";
 import { useWorkspace } from "./WorkspaceContext";
 
 export interface WorkspaceHeaderProps {
@@ -25,7 +26,8 @@ export function WorkspaceHeader({ onDownload }: WorkspaceHeaderProps) {
 			onDownload();
 		} else {
 			// Default behavior: trigger download via API
-			window.open(`/api/projects/${project.id}/download`, "_blank");
+			const downloadUrl = api.files.download(project.id);
+			window.open(downloadUrl, "_blank");
 		}
 	};
 

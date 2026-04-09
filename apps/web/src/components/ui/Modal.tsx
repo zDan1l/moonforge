@@ -70,10 +70,10 @@ export function Modal({
 	if (!isOpen) return null;
 
 	return (
-		<>
+		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
 			{/* Backdrop */}
 			<div
-				className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
+				className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200"
 				aria-hidden="true"
 				onClick={onClose}
 			/>
@@ -84,40 +84,42 @@ export function Modal({
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby={title ? "modal-title" : undefined}
-				className={`${sizeClasses[size]} w-full animate-in zoom-in-95 slide-in-from-bottom-4 duration-200`}
+				className="relative z-10 w-full animate-in zoom-in-95 slide-in-from-bottom-4 duration-200"
 			>
-				<div className="island-shell rounded-2xl shadow-xl">
-					{/* Header */}
-					{title && (
-						<div className="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-4">
-							<h2
-								id="modal-title"
-								className="text-lg font-semibold text-[var(--sea-ink)]"
-							>
-								{title}
-							</h2>
-							<button
-								type="button"
-								onClick={onClose}
-								className="rounded-lg p-1 text-[var(--sea-ink-soft)] transition hover:bg-[var(--hover-bg)] hover:text-[var(--sea-ink)]"
-								aria-label="Close modal"
-							>
-								<X className="h-5 w-5" />
-							</button>
-						</div>
-					)}
+				<div className={`${sizeClasses[size]} mx-auto`}>
+					<div className="island-shell rounded-2xl shadow-xl">
+						{/* Header */}
+						{title && (
+							<div className="flex items-center justify-between border-b border-[var(--border-color)] px-6 py-4">
+								<h2
+									id="modal-title"
+									className="text-lg font-semibold text-[var(--sea-ink)]"
+								>
+									{title}
+								</h2>
+								<button
+									type="button"
+									onClick={onClose}
+									className="rounded-lg p-1 text-[var(--sea-ink-soft)] transition hover:bg-[var(--hover-bg)] hover:text-[var(--sea-ink)]"
+									aria-label="Close modal"
+								>
+									<X className="h-5 w-5" />
+								</button>
+							</div>
+						)}
 
-					{/* Content */}
-					<div className="px-6 py-4">{children}</div>
+						{/* Content */}
+						<div className="px-6 py-4">{children}</div>
 
-					{/* Footer */}
-					{footer && (
-						<div className="flex items-center justify-end border-t border-[var(--border-color)] px-6 py-4">
-							{footer}
-						</div>
-					)}
+						{/* Footer */}
+						{footer && (
+							<div className="flex items-center justify-end border-t border-[var(--border-color)] px-6 py-4">
+								{footer}
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
-		</>
+		</div>
 	);
 }

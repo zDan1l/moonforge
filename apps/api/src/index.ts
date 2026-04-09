@@ -48,7 +48,8 @@ app.get("/health", async (c) => {
 		if (dbDuration > 50) {
 			dbStatus = "degraded";
 		}
-	} catch (_error) {
+	} catch (error) {
+		console.error("Database connection error:", error);
 		dbStatus = "unhealthy";
 		return c.json(
 			{
