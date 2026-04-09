@@ -7,10 +7,14 @@
  * DELETE /api/projects/:projectId/messages - Delete all messages
  */
 
-import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { success } from "../../lib/response.js";
-import { paginated } from "../../lib/response.js";
+import { Hono } from "hono";
+import { paginated, success } from "../../lib/response.js";
+import {
+	createMessageSchema,
+	listMessagesQuerySchema,
+	projectIdParamSchema,
+} from "./chat.schema.js";
 import {
 	createMessage,
 	deleteMessage,
@@ -19,11 +23,6 @@ import {
 	getMessageCount,
 	listMessages,
 } from "./chat.service.js";
-import {
-	createMessageSchema,
-	listMessagesQuerySchema,
-	projectIdParamSchema,
-} from "./chat.schema.js";
 
 const chat = new Hono();
 

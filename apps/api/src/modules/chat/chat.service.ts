@@ -168,7 +168,10 @@ export async function createMessage(
 		role: data.role,
 		content: data.content,
 		file_changes: data.fileChanges
-			? (JSON.parse(JSON.stringify(data.fileChanges)) as Record<string, unknown>)
+			? (JSON.parse(JSON.stringify(data.fileChanges)) as Record<
+					string,
+					unknown
+				>)
 			: null,
 	};
 
@@ -237,7 +240,9 @@ export async function getMessage(
 /**
  * Delete all messages for a project
  */
-export async function deleteMessages(projectId: string): Promise<{ deletedCount: number }> {
+export async function deleteMessages(
+	projectId: string,
+): Promise<{ deletedCount: number }> {
 	// Ensure project exists
 	await ensureProjectExists(projectId);
 
