@@ -37,7 +37,11 @@
 			"Bash(pnpm install:*)",
 			"Bash(pnpm:*)",
 			"Bash(find . -name \"schema.prisma\" -exec cat {} \\\\;)",
-			"Bash(npm run:*)"
+			"Bash(npm run:*)",
+			"Bash(npx prisma:*)",
+			"Bash(npx prisma@5 generate)",
+			"Bash(./node_modules/.bin/prisma generate:*)",
+			"Bash(npx tsc:*)"
 		]
 	}
 }
