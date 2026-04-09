@@ -26,6 +26,9 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.7.6
         version: 0.7.6(hono@4.12.12)(zod@4.3.6)
+      '@moonforge/generator':
+        specifier: workspace:*
+        version: link:../../packages/generator
       '@prisma/adapter-pg':
         specifier: ^7.7.0
         version: 7.7.0

@@ -8,7 +8,7 @@ import { success } from "./lib/response.js";
 import { corsMiddleware } from "./middleware/cors.js";
 import { errorHandler } from "./middleware/error-handler.js";
 import { loggerMiddleware } from "./middleware/logger.js";
-
+import generateRoutes from "./modules/generate/generate.routes.js";
 import projectsRoutes from "./modules/projects/projects.routes.js";
 
 config({ path: "../../.env" });
@@ -98,6 +98,7 @@ app.get("/health", async (c) => {
 // ============================================================================
 
 app.route("/api/projects", projectsRoutes);
+app.route("/api/generate", generateRoutes);
 
 // ============================================================================
 // Root Endpoint (temporary)

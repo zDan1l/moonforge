@@ -10,6 +10,7 @@
 		"@anthropic-ai/sdk": "^0.86.1",
 		"@hono/node-server": "^1.19.13",
 		"@hono/zod-validator": "^0.7.6",
+		"@moonforge/generator": "workspace:*",
 		"@prisma/adapter-pg": "^7.7.0",
 		"@prisma/client": "^7.7.0",
 		"dotenv": "^17.4.1",
