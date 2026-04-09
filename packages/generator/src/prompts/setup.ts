@@ -49,8 +49,58 @@ Based on user's description, generate:
    - {module}.service.ts: Prisma operations (CRUD)
 
 3. packages/types/src/index.ts
-   - Re-export Prisma types
-   - Add utility types if needed
+   - Re-export ALL Prisma types (use re-export for cleaner imports)
+   - Add Api namespace with common API types (ApiResponse, Pagination, etc.)
+   - Export model-specific types for use in frontend/backend
+
+## Types Package Format
+The packages/types/src/index.ts file MUST follow this structure:
+
+\`\`\`typescript
+/**
+ * Shared Types Package
+ * Auto-generated from Prisma schema - DO NOT EDIT MANUALLY
+ */
+
+// Re-export all Prisma types
+export * from '../generated/prisma/index.js';
+
+// Utility types
+export interface ApiResponse<T> {
+  success: true;
+  data: T;
+  meta?: {
+    timestamp?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface ApiError {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+  };
+  meta: {
+    timestamp: string;
+  };
+}
+
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  pagination: PaginationMeta;
+}
+
+// Common input types (create from Prisma models)
+export type { User, Project, /* ... all models */ };
+\`\`\`
 
 ## Conventions
 - Use TypeScript 5.x strict mode
