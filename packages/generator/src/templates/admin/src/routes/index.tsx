@@ -1,4 +1,4 @@
-import type { Route } from "./+types/index";
+`import type { Route } from "./+types/index";
 
 export function meta(_args: Route.MetaArgs) {
 	return [
@@ -33,6 +33,7 @@ export default function Index(_props: Route.ComponentProps) {
 												stroke="currentColor"
 												aria-label="Home icon"
 											>
+												<title>Projects</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -81,6 +82,7 @@ export default function Index(_props: Route.ComponentProps) {
 												stroke="currentColor"
 												aria-label="Check icon"
 											>
+												<title>Sessions</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
@@ -121,6 +123,7 @@ export default function Index(_props: Route.ComponentProps) {
 												stroke="currentColor"
 												aria-label="Clock icon"
 											>
+												<title>Time</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"

@@ -276,3 +276,82 @@ a {
 		transform: translateY(0);
 	}
 }
+
+/* ============================================================================
+   Workspace Design Tokens
+   Three-panel layout: Chat (left), Code Preview (middle), File Explorer (right)
+   ============================================================================ */
+
+.site-header {
+	height: 3.5rem;
+}
+
+.workspace-panel {
+	background: var(--header-bg);
+	backdrop-filter: blur(8px);
+}
+
+.chat-bubble-user {
+	background: var(--lagoon);
+	color: white;
+}
+
+.chat-bubble-assistant {
+	background: var(--surface-strong);
+	border: 1px solid var(--line);
+}
+
+.file-tree-item {
+	font-size: 0.875rem;
+	color: var(--sea-ink-soft);
+}
+
+.file-tree-item:hover {
+	background: var(--surface);
+}
+
+.file-tree-item.active {
+	color: var(--lagoon-deep);
+	background: color-mix(in oklab, var(--lagoon) 12%, transparent);
+}
+
+.file-badge-template {
+	font-size: 0.625rem;
+	padding: 1px 5px;
+	background: var(--chip-bg);
+	border: 1px solid var(--chip-line);
+	border-radius: 4px;
+}
+
+.file-badge-ai {
+	font-size: 0.625rem;
+	padding: 1px 5px;
+	background: color-mix(in oklab, var(--lagoon) 20%, transparent);
+	border: 1px solid color-mix(in oklab, var(--lagoon-deep) 35%, transparent);
+	border-radius: 4px;
+}
+
+.code-preview {
+	font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+	font-size: 0.8125rem;
+	line-height: 1.6;
+	background: var(--sand);
+}
+
+.code-preview pre {
+	font-family: inherit;
+}
+
+.code-preview code {
+	background: transparent;
+	border: none;
+	padding: 0;
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
