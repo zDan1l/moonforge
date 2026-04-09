@@ -8,6 +8,7 @@ import {
 } from "../chat/chat.schema.js";
 import * as chatService from "../chat/chat.service.js";
 import {
+	diffQuerySchema,
 	downloadQuerySchema,
 	listFilesQuerySchema,
 } from "../files/files.schema.js";
@@ -231,6 +232,34 @@ projects.get(
 		c.header("Content-Disposition", `attachment; filename="${filename}"`);
 
 		return c.body(zipBuffer as unknown as ArrayBuffer);
+	},
+);
+
+// GET /:projectId/diff — Get diff between two versions
+projects.get(
+	"/:projectId/diff",
+	zValidator("param", projectIdParamSchema),
+	zValidator("query", diffQuerySchema),
+	async (c) => {
+		const { projectId } = c.req.valid("param");
+		const { baseVersionId, targetVersionId, filePath } = c.req.valid("query");
+
+		if (filePath) {
+			const diff = await filesService.getFileDiff(
+				projectId,
+				baseVersionId,
+				targetVersionId,
+				filePath,
+			);
+			return c.json(success(diff), 200);
+		}
+
+		const diff = await filesService.getVersionDiff(
+			projectId,
+			baseVersionId,
+			targetVersionId,
+		);
+		return c.json(success(diff), 200);
 	},
 );
 

@@ -339,3 +339,257 @@ export async function getFileCount(
 
 	return count;
 }
+
+// ============================================================================
+// Diff Types
+// ============================================================================
+
+export interface FileDiff {
+	path: string;
+	status: "added" | "deleted" | "modified" | "unchanged";
+	baseContent: string | null;
+	targetContent: string | null;
+	lineDiff?: LineDiff[];
+}
+
+export interface LineDiff {
+	type: "added" | "removed" | "unchanged";
+	content: string;
+	lineNumber: number | null;
+}
+
+export interface DiffResult {
+	baseVersionId: string;
+	targetVersionId: string;
+	versionNumber: number;
+	projectId: string;
+	files: FileDiff[];
+	summary: {
+		total: number;
+		added: number;
+		deleted: number;
+		modified: number;
+		unchanged: number;
+	};
+}
+
+// ============================================================================
+// Diff Functions
+// ============================================================================
+
+/**
+ * Get file diff between two versions
+ */
+export async function getFileDiff(
+	projectId: string,
+	baseVersionId: string,
+	targetVersionId: string,
+	filePath: string,
+): Promise<FileDiff> {
+	// Get both versions to verify they exist
+	const [baseVersion, targetVersion] = await Promise.all([
+		prisma.project_versions.findUnique({ where: { id: baseVersionId } }),
+		prisma.project_versions.findUnique({ where: { id: targetVersionId } }),
+	]);
+
+	if (!baseVersion || !targetVersion) {
+		throw new NotFoundError("Version");
+	}
+
+	// Fetch file from both versions
+	const [baseFile, targetFile] = await Promise.all([
+		prisma.project_files.findFirst({
+			where: {
+				project_id: projectId,
+				version_id: baseVersionId,
+				path: filePath,
+			},
+		}),
+		prisma.project_files.findFirst({
+			where: {
+				project_id: projectId,
+				version_id: targetVersionId,
+				path: filePath,
+			},
+		}),
+	]);
+
+	const baseContent = baseFile?.content ?? null;
+	const targetContent = targetFile?.content ?? null;
+
+	// Determine status
+	let status: FileDiff["status"];
+	if (!baseFile && targetFile) {
+		status = "added";
+	} else if (baseFile && !targetFile) {
+		status = "deleted";
+	} else if (baseContent === targetContent) {
+		status = "unchanged";
+	} else {
+		status = "modified";
+	}
+
+	// Compute line diff if modified
+	let lineDiff: LineDiff[] | undefined;
+	if (status === "modified" && baseContent && targetContent) {
+		lineDiff = computeLineDiff(baseContent, targetContent);
+	}
+
+	return {
+		path: filePath,
+		status,
+		baseContent,
+		targetContent,
+		lineDiff,
+	};
+}
+
+/**
+ * Get all file diffs between two versions
+ */
+export async function getVersionDiff(
+	projectId: string,
+	baseVersionId: string,
+	targetVersionId: string,
+): Promise<Omit<DiffResult, "versionNumber">> {
+	// Verify versions exist and belong to project
+	const [baseVersion, targetVersion] = await Promise.all([
+		prisma.project_versions.findUnique({
+			where: { id: baseVersionId, project_id: projectId },
+		}),
+		prisma.project_versions.findUnique({
+			where: { id: targetVersionId, project_id: projectId },
+		}),
+	]);
+
+	if (!baseVersion || !targetVersion) {
+		throw new NotFoundError("Version");
+	}
+
+	// Get all files from both versions
+	const [baseFiles, targetFiles] = await Promise.all([
+		prisma.project_files.findMany({
+			where: { version_id: baseVersionId },
+			select: { path: true, content: true },
+		}),
+		prisma.project_files.findMany({
+			where: { version_id: targetVersionId },
+			select: { path: true, content: true },
+		}),
+	]);
+
+	const baseMap = new Map(baseFiles.map((f) => [f.path, f.content]));
+	const targetMap = new Map(targetFiles.map((f) => [f.path, f.content]));
+
+	// Collect all unique paths
+	const allPaths = new Set([...baseMap.keys(), ...targetMap.keys()]);
+
+	// Compute diff for each file
+	const files: FileDiff[] = [];
+	let added = 0;
+	let deleted = 0;
+	let modified = 0;
+	let unchanged = 0;
+
+	for (const path of Array.from(allPaths).sort()) {
+		const baseContent = baseMap.get(path) ?? null;
+		const targetContent = targetMap.get(path) ?? null;
+
+		let status: FileDiff["status"];
+		let lineDiff: LineDiff[] | undefined;
+
+		if (baseContent === null && targetContent !== null) {
+			status = "added";
+			added++;
+		} else if (baseContent !== null && targetContent === null) {
+			status = "deleted";
+			deleted++;
+		} else if (baseContent === targetContent) {
+			status = "unchanged";
+			unchanged++;
+		} else {
+			status = "modified";
+			modified++;
+			if (baseContent && targetContent) {
+				lineDiff = computeLineDiff(baseContent, targetContent);
+			}
+		}
+
+		files.push({ path, status, baseContent, targetContent, lineDiff });
+	}
+
+	return {
+		baseVersionId,
+		targetVersionId,
+		projectId,
+		files,
+		summary: {
+			total: files.length,
+			added,
+			deleted,
+			modified,
+			unchanged,
+		},
+	};
+}
+
+/**
+ * Compute line-by-line diff between two content strings
+ */
+function computeLineDiff(
+	baseContent: string,
+	targetContent: string,
+): LineDiff[] {
+	const baseLines = baseContent.split("\n");
+	const targetLines = targetContent.split("\n");
+	const result: LineDiff[] = [];
+
+	// Simple line diff algorithm
+	let baseIdx = 0;
+	let targetIdx = 0;
+
+	while (baseIdx < baseLines.length || targetIdx < targetLines.length) {
+		if (baseIdx >= baseLines.length) {
+			// Remaining lines are added
+			result.push({
+				type: "added",
+				content: targetLines[targetIdx],
+				lineNumber: null,
+			});
+			targetIdx++;
+		} else if (targetIdx >= targetLines.length) {
+			// Remaining lines are removed
+			result.push({
+				type: "removed",
+				content: baseLines[baseIdx],
+				lineNumber: null,
+			});
+			baseIdx++;
+		} else if (baseLines[baseIdx] === targetLines[targetIdx]) {
+			// Lines match
+			result.push({
+				type: "unchanged",
+				content: baseLines[baseIdx],
+				lineNumber: baseIdx + 1,
+			});
+			baseIdx++;
+			targetIdx++;
+		} else {
+			// Lines differ - mark both (simple approach)
+			result.push({
+				type: "removed",
+				content: baseLines[baseIdx],
+				lineNumber: baseIdx + 1,
+			});
+			result.push({
+				type: "added",
+				content: targetLines[targetIdx],
+				lineNumber: null,
+			});
+			baseIdx++;
+			targetIdx++;
+		}
+	}
+
+	return result;
+}
