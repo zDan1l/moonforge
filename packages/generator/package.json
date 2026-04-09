@@ -25,8 +25,8 @@
 	},
 	"scripts": {
 		"build": "tsc",
-		"dev": "tsc --watch",
-		"typecheck": "tsc --noEmit"
+		"dev": "npx tsc --watch",
+		"typecheck": "npx tsc --noEmit"
 	},
 	"dependencies": {
 		"adm-zip": "^0.5.16"
