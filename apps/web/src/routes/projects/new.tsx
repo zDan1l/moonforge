@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { api, type Project } from "#/lib/api";
+import { api } from "#/lib/api";
 
 export const Route = createFileRoute("/projects/new")({
 	component: NewProjectPage,
@@ -36,8 +36,7 @@ function NewProjectPage() {
 		if (description.trim().length < 10) {
 			newErrors.description = "Description must be at least 10 characters";
 		} else if (description.trim().length > 500) {
-			newErrors.description =
-				"Description must be 500 characters or less";
+			newErrors.description = "Description must be 500 characters or less";
 		}
 
 		if (Object.keys(newErrors).length > 0) {

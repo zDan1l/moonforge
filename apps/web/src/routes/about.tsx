@@ -117,7 +117,9 @@ function About() {
 							</p>
 						</div>
 						<div>
-							<h3 className="mb-2 font-semibold text-[var(--sea-ink)]">Backend</h3>
+							<h3 className="mb-2 font-semibold text-[var(--sea-ink)]">
+								Backend
+							</h3>
 							<p className="text-sm text-[var(--sea-ink-soft)]">Hono.js</p>
 						</div>
 						<div>
@@ -135,7 +137,9 @@ function About() {
 							</p>
 						</div>
 						<div>
-							<h3 className="mb-2 font-semibold text-[var(--sea-ink)]">Monorepo</h3>
+							<h3 className="mb-2 font-semibold text-[var(--sea-ink)]">
+								Monorepo
+							</h3>
 							<p className="text-sm text-[var(--sea-ink-soft)]">Moon + PNPM</p>
 						</div>
 						<div>
@@ -154,8 +158,8 @@ function About() {
 					Ready to build?
 				</h2>
 				<p className="mb-6 text-[var(--sea-ink-soft)]">
-					Create your first MoonForge project and go from idea to running monorepo
-					in minutes.
+					Create your first MoonForge project and go from idea to running
+					monorepo in minutes.
 				</p>
 				<Link
 					to="/dashboard"

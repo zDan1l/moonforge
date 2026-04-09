@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { api, type Project } from "#/lib/api";
+import { api } from "#/lib/api";
 
 export const Route = createFileRoute("/projects/$projectId/setup")({
 	component: SetupPage,
@@ -57,8 +57,7 @@ function SetupPage() {
 		}
 
 		if (description.trim().length < 10) {
-			newErrors.description =
-				"Description must be at least 10 characters";
+			newErrors.description = "Description must be at least 10 characters";
 		}
 
 		if (prompt.trim().length < 10) {
@@ -127,8 +126,8 @@ function SetupPage() {
 					Generate Your Project
 				</h1>
 				<p className="text-[var(--sea-ink-soft)]">
-					Describe what you want to build and AI will generate a production-ready
-					Moon monorepo for you.
+					Describe what you want to build and AI will generate a
+					production-ready Moon monorepo for you.
 				</p>
 			</div>
 
@@ -190,8 +189,8 @@ function SetupPage() {
 							Generate Prompt <span className="text-[var(--palm)]">*</span>
 						</label>
 						<p className="mb-2 text-xs text-[var(--sea-ink-soft)]">
-							Describe your project in detail. Include the modules, features, and
-							any specific requirements.
+							Describe your project in detail. Include the modules, features,
+							and any specific requirements.
 						</p>
 						<textarea
 							id="generate-prompt"
@@ -261,9 +260,7 @@ Or keep it simple: 'E-commerce marketplace with products, orders, and reviews'"
 					<ul className="space-y-1 text-xs text-[var(--sea-ink-soft)]">
 						<li className="flex gap-2">
 							<span className="text-[var(--lagoon)]">•</span>
-							<span>
-								Be specific about the features and modules you need
-							</span>
+							<span>Be specific about the features and modules you need</span>
 						</li>
 						<li className="flex gap-2">
 							<span className="text-[var(--lagoon)]">•</span>

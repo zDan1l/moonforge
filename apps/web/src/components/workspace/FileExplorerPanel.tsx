@@ -5,12 +5,18 @@
  * Shows files with [T], [AI], and modified badges.
  */
 
-import { ChevronDown, ChevronRight, File, FileText, Folder } from "lucide-react";
+import {
+	ChevronDown,
+	ChevronRight,
+	File,
+	FileText,
+	Folder,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import type { FileTreeNode } from "../../lib/api";
 import { api } from "../../lib/api";
-import { useWorkspace } from "./WorkspaceContext";
 import { FileSourceBadge } from "../ui/Badge";
+import { useWorkspace } from "./WorkspaceContext";
 
 export function FileExplorerPanel() {
 	const { project, selectedFile, setSelectedFile } = useWorkspace();
@@ -189,7 +195,11 @@ function FileTreeNodeItem({
 						<span className="h-3.5 w-3.5 flex-shrink-0" />
 						<File className="h-4 w-4 flex-shrink-0" />
 						<span className="truncate">{node.name}</span>
-						<FileSourceBadge source={node.source} size="sm" className="ml-auto" />
+						<FileSourceBadge
+							source={node.source}
+							size="sm"
+							className="ml-auto"
+						/>
 					</>
 				)}
 			</button>

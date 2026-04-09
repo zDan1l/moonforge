@@ -202,7 +202,10 @@ export const api = {
 	},
 
 	files: {
-		list: (projectId: string, query?: { versionId?: string; directory?: string }) => {
+		list: (
+			projectId: string,
+			query?: { versionId?: string; directory?: string },
+		) => {
 			const searchParams =
 				query && Object.keys(query).length > 0
 					? "?" +
@@ -213,7 +216,9 @@ export const api = {
 							][],
 						).toString()
 					: "";
-			return apiRequest<FileTreeNode[]>(`/projects/${projectId}/files${searchParams}`);
+			return apiRequest<FileTreeNode[]>(
+				`/projects/${projectId}/files${searchParams}`,
+			);
 		},
 
 		get: (projectId: string, path: string, versionId?: string) => {
@@ -286,9 +291,9 @@ export const api = {
 // Export types for use in components
 export type {
 	CreateProjectInput,
+	FileTreeNode,
+	GenerateRefineInput,
+	GenerateSetupInput,
 	ListProjectsQuery,
 	UpdateProjectInput,
-	GenerateSetupInput,
-	GenerateRefineInput,
-	FileTreeNode,
 };

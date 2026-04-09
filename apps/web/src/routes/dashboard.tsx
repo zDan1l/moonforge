@@ -1,17 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
+	Activity,
+	ArrowRight,
+	Clock,
 	FileCode,
 	FolderKanban,
 	MessageSquare,
-	TrendingUp,
 	Plus,
-	ArrowRight,
-	Activity,
-	Clock,
+	TrendingUp,
 } from "lucide-react";
-import { Card } from "#/components/ui/Card";
-import { Button } from "#/components/ui/Button";
 import { StatusBadge } from "#/components/ui";
+import { Card } from "#/components/ui/Card";
 import { api, type Project } from "#/lib/api";
 
 export const Route = createFileRoute("/dashboard")({
@@ -213,7 +212,9 @@ function StatCard({ title, value, icon, color, trend }: StatCardProps) {
 						<p className="mt-1 text-xs text-[var(--sea-ink-soft)]">{trend}</p>
 					)}
 				</div>
-				<div className={`flex h-10 w-10 items-center justify-center rounded-lg ${colorClasses[color]}`}>
+				<div
+					className={`flex h-10 w-10 items-center justify-center rounded-lg ${colorClasses[color]}`}
+				>
 					{icon}
 				</div>
 			</div>
@@ -228,7 +229,12 @@ interface ActionButtonProps {
 	onClick?: () => void;
 }
 
-function ActionButton({ title, description, icon, onClick }: ActionButtonProps) {
+function ActionButton({
+	title,
+	description,
+	icon,
+	onClick,
+}: ActionButtonProps) {
 	return (
 		<button
 			type="button"
