@@ -65,6 +65,19 @@ export interface ProjectFile {
 	updated_at: string;
 }
 
+export interface ChatMessage {
+	id: string;
+	project_id: string;
+	version_id: string | null;
+	role: "user" | "assistant";
+	content: string;
+	file_changes: Record<
+		string,
+		{ path: string; change: "created" | "modified" | "deleted" }
+	> | null;
+	created_at: string;
+}
+
 // List projects query params
 export interface ListProjectsQuery {
 	status?: "draft" | "generated" | "refined";
@@ -159,6 +172,44 @@ export const api = {
 			apiRequest<ProjectFile>(
 				`/projects/${projectId}/files/${encodeURIComponent(path)}`,
 			),
+	},
+
+	chat: {
+		list: (
+			projectId: string,
+			query?: { versionId?: string; limit?: number },
+		) => {
+			const searchParams =
+				query && Object.keys(query).length > 0
+					? "?" +
+						new URLSearchParams(
+							Object.entries(query).filter(([, v]) => v !== undefined) as [
+								string,
+								string,
+							][],
+						).toString()
+					: "";
+			return apiRequest<ChatMessage[]>(
+				`/projects/${projectId}/messages${searchParams}`,
+			);
+		},
+
+		create: (
+			projectId: string,
+			data: {
+				role: "user" | "assistant";
+				content: string;
+				versionId?: string;
+				fileChanges?: Record<
+					string,
+					{ path: string; change: "created" | "modified" | "deleted" }
+				>;
+			},
+		) =>
+			apiRequest<ChatMessage>(`/projects/${projectId}/messages`, {
+				method: "POST",
+				body: JSON.stringify(data),
+			}),
 	},
 };
 
