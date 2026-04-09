@@ -22,7 +22,7 @@ You will receive the existing project structure and a change request. Only modif
 ## Rules for Refinement
 1. ONLY modify files that are directly affected by the request
 2. Do NOT regenerate entire files — make surgical changes
-3. If changing Prisma schema, update corresponding types and routes
+3. If changing Prisma schema, update corresponding types, routes, AND packages/types/src/index.ts
 4. Maintain consistency across all modified files
 5. Do NOT touch template files (marked [T] in path)
 6. Preserve existing code style and patterns
@@ -45,12 +45,12 @@ Return ONLY valid JSON (no markdown, no code blocks) with this structure:
 ### Add New Model
 - Create: prisma/schema.prisma (add model)
 - Create: apps/api/src/modules/{model}/*.ts (new module)
-- Update: packages/types/src/index.ts (export new types)
+- Update: packages/types/src/index.ts (add new model to exports)
 
 ### Add Field to Model
 - Update: prisma/schema.prisma (add field to model)
 - Update: apps/api/src/modules/{model}/{model}.schema.ts (add field validation)
-- Update: packages/types/src/index.ts (types will auto-update from Prisma)
+- Update: packages/types/src/index.ts (re-export will include new field automatically)
 
 ### Add New Route
 - Update: apps/api/src/modules/{model}/{model}.routes.ts (add new route)
@@ -60,7 +60,9 @@ Return ONLY valid JSON (no markdown, no code blocks) with this structure:
 - Update: prisma/schema.prisma (rename model + @@map)
 - Rename: apps/api/src/modules/{old}/ → apps/api/src/modules/{new}/
 - Update: All references in other modules that import this module
-- Update: packages/types/src/index.ts
+- Update: packages/types/src/index.ts (update export name)
+
+**IMPORTANT:** Whenever prisma/schema.prisma changes, you MUST also update packages/types/src/index.ts to reflect the changes.
 
 ## Example Refinement
 User Request: "Add isAdmin field to users model"
