@@ -67,28 +67,17 @@ export function ChatPanel() {
 			setIsGenerating(true);
 			setActiveMessageId(userMsg.id);
 
-			const response = await fetch("/api/generate/refine", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					projectId,
-					messageId: userMsg.id,
-					userMessage: userMessage,
-				}),
+			const result = await api.generate.refine({
+				projectId,
+				request: userMessage,
 			});
-
-			if (!response.ok) {
-				throw new Error("Failed to process refine request");
-			}
-
-			const result = await response.json();
 
 			// Create assistant message with response
 			const assistantMsg = await api.chat.create(projectId, {
 				role: "assistant",
-				content: result.data.summary || "Changes applied successfully.",
-				versionId: result.data.versionId,
-				fileChanges: result.data.fileChanges,
+				content: result.summary || "Changes applied successfully.",
+				versionId: result.versionId,
+				fileChanges: result.fileChanges,
 			});
 
 			setMessages((prev) => [...prev, assistantMsg]);
@@ -139,7 +128,7 @@ export function ChatPanel() {
 	};
 
 	return (
-		<aside className="workspace-panel flex w-80 flex-shrink-0 flex-col border-r border-[var(--line)] bg-[var(--header-bg)]">
+		<aside className="workspace-panel flex w-80 flex-shrink-0 flex-col border-l border-[var(--line)] bg-[var(--header-bg)]">
 			{/* Header */}
 			<div className="flex items-center border-b border-[var(--line)] px-4 py-3">
 				<h2 className="text-sm font-semibold text-[var(--sea-ink)]">Chat</h2>

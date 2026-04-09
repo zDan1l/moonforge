@@ -98,6 +98,47 @@ export interface UpdateProjectInput {
 	status?: "draft" | "generated" | "refined";
 }
 
+// Generate input
+export interface GenerateSetupInput {
+	projectId: string;
+	description: string;
+	additionalContext?: string;
+}
+
+export interface GenerateRefineInput {
+	projectId: string;
+	request: string;
+}
+
+export interface GenerateSetupResult {
+	projectId: string;
+	versionId: string;
+	versionNumber: number;
+	filesGenerated: number;
+	summary: string;
+}
+
+export interface GenerateRefineResult {
+	projectId: string;
+	versionId: string;
+	versionNumber: number;
+	filesChanged: number;
+	fileChanges: Record<
+		string,
+		{ path: string; change: "created" | "modified" | "deleted" }
+	>;
+	summary: string;
+}
+
+// File tree node type from API
+export interface FileTreeNode {
+	name: string;
+	path: string;
+	type: "file" | "directory";
+	source: "template" | "ai_generated" | "modified";
+	children?: FileTreeNode[];
+}
+
 // Generic API request function
 async function apiRequest<T>(
 	endpoint: string,
@@ -161,17 +202,32 @@ export const api = {
 	},
 
 	files: {
-		list: (projectId: string, versionId?: string) => {
-			const searchParams = versionId ? `?version_id=${versionId}` : "";
-			return apiRequest<ProjectFile[]>(
-				`/projects/${projectId}/files${searchParams}`,
+		list: (projectId: string, query?: { versionId?: string; directory?: string }) => {
+			const searchParams =
+				query && Object.keys(query).length > 0
+					? "?" +
+						new URLSearchParams(
+							Object.entries(query).filter(([, v]) => v !== undefined) as [
+								string,
+								string,
+							][],
+						).toString()
+					: "";
+			return apiRequest<FileTreeNode[]>(`/projects/${projectId}/files${searchParams}`);
+		},
+
+		get: (projectId: string, path: string, versionId?: string) => {
+			const searchParams = versionId ? `?versionId=${versionId}` : "";
+			return apiRequest<ProjectFile>(
+				`/projects/${projectId}/files/${encodeURIComponent(path)}${searchParams}`,
 			);
 		},
 
-		get: (projectId: string, path: string) =>
-			apiRequest<ProjectFile>(
-				`/projects/${projectId}/files/${encodeURIComponent(path)}`,
-			),
+		download: (projectId: string, versionId?: string) => {
+			// Returns a URL for direct browser download
+			const params = versionId ? `?versionId=${versionId}` : "";
+			return `/api/projects/${projectId}/download${params}`;
+		},
 	},
 
 	chat: {
@@ -211,7 +267,28 @@ export const api = {
 				body: JSON.stringify(data),
 			}),
 	},
+
+	generate: {
+		setup: (data: GenerateSetupInput) =>
+			apiRequest<GenerateSetupResult>("/generate/setup", {
+				method: "POST",
+				body: JSON.stringify(data),
+			}),
+
+		refine: (data: GenerateRefineInput) =>
+			apiRequest<GenerateRefineResult>("/generate/refine", {
+				method: "POST",
+				body: JSON.stringify(data),
+			}),
+	},
 };
 
 // Export types for use in components
-export type { CreateProjectInput, ListProjectsQuery, UpdateProjectInput };
+export type {
+	CreateProjectInput,
+	ListProjectsQuery,
+	UpdateProjectInput,
+	GenerateSetupInput,
+	GenerateRefineInput,
+	FileTreeNode,
+};

@@ -17,6 +17,15 @@ export function Header() {
 				{/* Navigation */}
 				<nav className="flex items-center gap-6">
 					<Link
+						to="/dashboard"
+						className="nav-link text-sm font-medium"
+						activeProps={{
+							className: "is-active",
+						}}
+					>
+						Dashboard
+					</Link>
+					<Link
 						to="/projects"
 						className="nav-link text-sm font-medium"
 						activeProps={{

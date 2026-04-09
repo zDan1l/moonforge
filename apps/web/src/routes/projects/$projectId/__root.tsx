@@ -23,7 +23,8 @@ function WorkspaceLayout() {
 
 	const handleDownload = () => {
 		// Trigger download via API
-		window.open(`/api/projects/${project.id}/download`, "_blank");
+		const downloadUrl = api.files.download(project.id);
+		window.open(downloadUrl, "_blank");
 	};
 
 	return (
@@ -34,14 +35,14 @@ function WorkspaceLayout() {
 
 				{/* Three-Panel Layout */}
 				<div className="flex flex-1 overflow-hidden">
-					{/* Panel Kiri — Chat */}
-					<ChatPanel />
+					{/* Panel Kiri — File Explorer */}
+					<FileExplorerPanel />
 
 					{/* Panel Tengah — Code Preview */}
 					<CodePreviewPanel />
 
-					{/* Panel Kanan — File Explorer */}
-					<FileExplorerPanel />
+					{/* Panel Kanan — Chat */}
+					<ChatPanel />
 				</div>
 			</div>
 		</WorkspaceProvider>
