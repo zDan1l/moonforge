@@ -90,6 +90,22 @@ export {
 	transformTemplatePaths,
 	validateProjectName,
 } from "./builder.js";
+// File storage and template merge utilities
+export {
+	decodeBinaryContent,
+	encodeBinaryContent,
+	type FileSummary,
+	isBinaryFile,
+	isValidPath,
+	type MergeOptions,
+	type MergeResult,
+	mergeForRefine,
+	mergeWithTemplate,
+	normalizePath,
+	summarizeFiles,
+	type TemplateFile,
+	truncateContent,
+} from "./files.js";
 export {
 	applySelectiveOverrides,
 	filterFilesBySource,

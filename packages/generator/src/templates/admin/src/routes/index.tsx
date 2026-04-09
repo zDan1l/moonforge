@@ -1,6 +1,6 @@
 import type { Route } from "./+types/index";
 
-export function meta(_route: Route.MetaArgs) {
+export function meta(_args: Route.MetaArgs) {
 	return [
 		{ title: "Admin Dashboard" },
 		{
@@ -10,7 +10,7 @@ export function meta(_route: Route.MetaArgs) {
 	];
 }
 
-export default function Index(_route: Route.ComponentProps) {
+export default function Index(_props: Route.ComponentProps) {
 	return (
 		<div className="min-h-screen bg-gray-50">
 			<div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -31,7 +31,7 @@ export default function Index(_route: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
-												aria-label="Projects icon"
+												aria-label="Home icon"
 											>
 												<title>Projects</title>
 												<path
@@ -80,7 +80,7 @@ export default function Index(_route: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
-												aria-label="Sessions icon"
+												aria-label="Check icon"
 											>
 												<title>Sessions</title>
 												<path
@@ -121,7 +121,7 @@ export default function Index(_route: Route.ComponentProps) {
 												fill="none"
 												viewBox="0 0 24 24"
 												stroke="currentColor"
-												aria-label="Time icon"
+												aria-label="Clock icon"
 											>
 												<title>Time</title>
 												<path
