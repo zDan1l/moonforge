@@ -34,14 +34,12 @@ export interface ProjectStructureOptions {
 	projectSlug: string;
 }
 
-export function buildProjectStructure(
-	options: ProjectStructureOptions,
-): {
+export function buildProjectStructure(options: ProjectStructureOptions): {
 	rootPath: string;
 	folderPaths: string[];
 	templateMapping: Map<string, string>;
 } {
-	const { projectName, projectSlug } = options;
+	const { projectSlug } = options;
 
 	// Root path for the project
 	const rootPath = projectSlug;
@@ -80,40 +78,94 @@ export function buildProjectStructure(
 
 	// Root templates
 	templateMapping.set("root/package.json", `${rootPath}/package.json`);
-	templateMapping.set("root/pnpm-workspace.yaml", `${rootPath}/pnpm-workspace.yaml`);
+	templateMapping.set(
+		"root/pnpm-workspace.yaml",
+		`${rootPath}/pnpm-workspace.yaml`,
+	);
 	templateMapping.set("root/tsconfig.json", `${rootPath}/tsconfig.json`);
 	templateMapping.set("root/.moon", `${rootPath}/.moon`);
-	templateMapping.set("root/.moon/workspace.yml", `${rootPath}/.moon/workspace.yml`);
+	templateMapping.set(
+		"root/.moon/workspace.yml",
+		`${rootPath}/.moon/workspace.yml`,
+	);
 	templateMapping.set("root/.moon/tasks.yml", `${rootPath}/.moon/tasks.yml`);
 	templateMapping.set("root/biome.json", `${rootPath}/biome.json`);
 	templateMapping.set("root/.gitignore", `${rootPath}/.gitignore`);
 	templateMapping.set("root/.env.example", `${rootPath}/.env.example`);
-	templateMapping.set("root/docker-compose.yml", `${rootPath}/docker-compose.yml`);
-	templateMapping.set("root/docker-compose.dev.yaml", `${rootPath}/docker-compose.dev.yaml`);
+	templateMapping.set(
+		"root/docker-compose.yml",
+		`${rootPath}/docker-compose.yml`,
+	);
+	templateMapping.set(
+		"root/docker-compose.dev.yaml",
+		`${rootPath}/docker-compose.dev.yaml`,
+	);
 	templateMapping.set("root/moon.yml", `${rootPath}/moon.yml`);
 
 	// Backend templates
-	templateMapping.set("backend/package.json", `${rootPath}/apps/api/package.json`);
-	templateMapping.set("backend/tsconfig.json", `${rootPath}/apps/api/tsconfig.json`);
-	templateMapping.set("backend/prisma.config.ts", `${rootPath}/apps/api/prisma.config.ts`);
-	templateMapping.set("backend/prisma/schema.prisma", `${rootPath}/apps/api/prisma/schema.prisma`);
-	templateMapping.set("backend/src/index.ts", `${rootPath}/apps/api/src/index.ts`);
-	templateMapping.set("backend/src/lib/prisma.ts", `${rootPath}/apps/api/src/lib/prisma.ts`);
+	templateMapping.set(
+		"backend/package.json",
+		`${rootPath}/apps/api/package.json`,
+	);
+	templateMapping.set(
+		"backend/tsconfig.json",
+		`${rootPath}/apps/api/tsconfig.json`,
+	);
+	templateMapping.set(
+		"backend/prisma.config.ts",
+		`${rootPath}/apps/api/prisma.config.ts`,
+	);
+	templateMapping.set(
+		"backend/prisma/schema.prisma",
+		`${rootPath}/apps/api/prisma/schema.prisma`,
+	);
+	templateMapping.set(
+		"backend/src/index.ts",
+		`${rootPath}/apps/api/src/index.ts`,
+	);
+	templateMapping.set(
+		"backend/src/lib/prisma.ts",
+		`${rootPath}/apps/api/src/lib/prisma.ts`,
+	);
 
 	// Frontend templates (platform)
-	templateMapping.set("frontend/package.json", `${rootPath}/apps/platform/package.json`);
-	templateMapping.set("frontend/tsconfig.json", `${rootPath}/apps/platform/tsconfig.json`);
-	templateMapping.set("frontend/vite.config.ts", `${rootPath}/apps/platform/vite.config.ts`);
+	templateMapping.set(
+		"frontend/package.json",
+		`${rootPath}/apps/platform/package.json`,
+	);
+	templateMapping.set(
+		"frontend/tsconfig.json",
+		`${rootPath}/apps/platform/tsconfig.json`,
+	);
+	templateMapping.set(
+		"frontend/vite.config.ts",
+		`${rootPath}/apps/platform/vite.config.ts`,
+	);
 	templateMapping.set("frontend/public", `${rootPath}/apps/platform/public`);
 
 	// Admin templates
-	templateMapping.set("admin/package.json", `${rootPath}/apps/admin/package.json`);
-	templateMapping.set("admin/tsconfig.json", `${rootPath}/apps/admin/tsconfig.json`);
+	templateMapping.set(
+		"admin/package.json",
+		`${rootPath}/apps/admin/package.json`,
+	);
+	templateMapping.set(
+		"admin/tsconfig.json",
+		`${rootPath}/apps/admin/tsconfig.json`,
+	);
 
 	// Types package
-	templateMapping.set("types/package.json", `${rootPath}/packages/types/package.json`);
-	templateMapping.set("types/tsconfig.json", `${rootPath}/packages/types/tsconfig.json`);
-	templateMapping.set("types/src/index.ts", `${rootPath}/packages/types/src/index.ts`);
+	templateMapping.set(
+		"types/package.json",
+		`${rootPath}/packages/types/package.json`,
+	);
+	templateMapping.set(
+		"types/tsconfig.json",
+		`${rootPath}/packages/types/tsconfig.json`,
+	);
+	templateMapping.set(
+		"types/src/index.ts",
+		`${rootPath}/packages/types/src/index.ts`,
+	);
 
 	return {
 		rootPath,
@@ -193,7 +245,10 @@ export function isValidOutputPath(path: string): boolean {
 /**
  * Generate root-level config files for a new project
  */
-export function generateRootConfigFiles(projectName: string, projectSlug: string): GeneratedFile[] {
+export function generateRootConfigFiles(
+	_projectName: string,
+	projectSlug: string,
+): GeneratedFile[] {
 	const rootFiles: GeneratedFile[] = [];
 
 	// Root package.json

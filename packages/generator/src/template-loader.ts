@@ -3,8 +3,8 @@
  * Functions for loading template files from the filesystem
  */
 
-import { readdir, readFile, stat } from "fs/promises";
-import { join, relative, resolve } from "path";
+import { readdir, readFile, stat } from "node:fs/promises";
+import { join, relative, resolve } from "node:path";
 import type { GeneratedFile } from "./index.js";
 
 const TEMPLATE_BASE_PATH = resolve(import.meta.dirname, "templates");

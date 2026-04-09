@@ -13,9 +13,8 @@
 
 // Re-export types from Prisma generated client
 // These will be populated when the AI generates the Prisma schema
-export type {
-	// Prisma types will be exported here after schema generation
-} from "../../apps/api/src/generated/prisma/client.js";
+export type {} from // Prisma types will be exported here after schema generation
+"../../apps/api/src/generated/prisma/client.js";
 
 // ============================================================================
 // Utility Types
