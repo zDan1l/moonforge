@@ -9,7 +9,14 @@ import tsconfigPaths from "vite-tsconfig-paths";
 const config = defineConfig({
 	plugins: [
 		devtools(),
-		nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+		nitro({
+			rollupConfig: { external: [/^@sentry\//] },
+			routeRules: {
+				"/api/**": {
+					proxy: { to: "http://localhost:5000/api/**" },
+				},
+			},
+		}),
 		tsconfigPaths({ projects: ["./tsconfig.json"] }),
 		tailwindcss(),
 		tanstackStart(),
