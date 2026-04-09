@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, Code, FileText, MessageSquare } from "lucide-react";
 import { api } from "../../../lib/api";
 
-export const Route = createFileRoute("/projects/$projectId/")({
+export const Route = createFileRoute("/projects/$projectId/__root")({
 	loader: async ({ params }) => {
 		const project = await api.projects.get(params.projectId);
 		return { project };

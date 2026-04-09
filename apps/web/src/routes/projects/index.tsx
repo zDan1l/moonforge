@@ -1,21 +1,35 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FileCode, FolderOpen, Plus } from "lucide-react";
-import { api, type Project } from "../../lib/api";
+import {
+	AlertCircle,
+	FileCode,
+	FolderOpen,
+	Plus,
+	RefreshCw,
+} from "lucide-react";
+import type { Project } from "../../lib/api";
+import { api } from "../../lib/api";
 
 export const Route = createFileRoute("/projects/")({
 	component: ProjectListPage,
 	loader: async () => {
 		try {
 			const projects = await api.projects.list();
-			return { projects };
-		} catch {
-			return { projects: [] as Project[] };
+			return { projects, error: null };
+		} catch (error) {
+			console.error("Failed to fetch projects:", error);
+			return {
+				projects: [] as Project[],
+				error:
+					error instanceof Error
+						? error.message
+						: "Gagal terhubung ke server. Pastikan API berjalan.",
+			};
 		}
 	},
 });
 
 function ProjectListPage() {
-	const { projects } = Route.useLoaderData();
+	const { projects, error } = Route.useLoaderData();
 
 	return (
 		<div className="page-wrap px-4 py-8">
@@ -32,7 +46,40 @@ function ProjectListPage() {
 				</button>
 			</div>
 
-			{projects.length === 0 ? (
+			{/* Error State */}
+			{error && (
+				<div
+					className="mb-6 flex flex-col items-center justify-center rounded-2xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900 dark:bg-red-950"
+					role="alert"
+				>
+					<AlertCircle
+						className="mb-4 h-12 w-12 text-red-500 dark:text-red-400"
+						aria-hidden="true"
+					/>
+					<h2 className="mb-2 text-lg font-semibold text-red-700 dark:text-red-300">
+						Terjadi kesalahan
+					</h2>
+					<p className="mb-6 max-w-md text-sm text-red-600 dark:text-red-400">
+						{error}
+					</p>
+					<div className="flex gap-3">
+						<button
+							type="button"
+							onClick={() => window.location.reload()}
+							className="flex items-center gap-2 rounded-full bg-[var(--lagoon)] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[var(--lagoon-deep)]"
+						>
+							<RefreshCw className="h-4 w-4" />
+							Coba Lagi
+						</button>
+					</div>
+					<p className="mt-4 text-xs text-red-500/70 dark:text-red-400/70">
+						Pastikan backend API berjalan di port 5000
+					</p>
+				</div>
+			)}
+
+			{/* Empty State */}
+			{!error && projects.length === 0 && (
 				<div className="island-shell flex flex-col items-center justify-center rounded-2xl p-12 text-center">
 					<FolderOpen className="mb-4 h-12 w-12 text-[var(--sea-ink-soft)]" />
 					<h2 className="mb-2 text-lg font-semibold text-[var(--sea-ink)]">
@@ -50,7 +97,10 @@ function ProjectListPage() {
 						Create First Project
 					</button>
 				</div>
-			) : (
+			)}
+
+			{/* Project List */}
+			{!error && projects.length > 0 && (
 				<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 					{projects.map((project) => (
 						<Link
